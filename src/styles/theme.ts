@@ -11,7 +11,7 @@ const roboto = Roboto({
 
 const lightPalette = {
   primary: {
-    main: "#6a1b9a",
+    main: "#3b82f6",
   },
   secondary: {
     main: "#ff9800",
@@ -28,7 +28,7 @@ const lightPalette = {
 
 const darkPalette = {
   primary: {
-    main: "#6a1b9a",
+    main: "#3b82f6",
   },
   secondary: {
     main: "#ff9800",
@@ -65,6 +65,10 @@ export const theme = createTheme({
       [baseTheme.breakpoints.up("lg")]: {
         fontSize: "3.5rem",
       },
+    },
+    h6: {
+      fontSize: "1.25rem",
+      fontWeight: 700,
     },
     button: {
       fontWeight: 700,

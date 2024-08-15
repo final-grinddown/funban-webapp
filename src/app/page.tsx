@@ -1,9 +1,10 @@
-import { Box, Button } from "@mui/material"
+import { Button } from "@mui/material"
+import { DashboardLayout } from "@/components/DashboardLayout"
 
 export default function Home() {
   return (
-    <Box>
+    <DashboardLayout>
       <Button color={"primary"}>test</Button>
-    </Box>
+    </DashboardLayout>
   )
 }
