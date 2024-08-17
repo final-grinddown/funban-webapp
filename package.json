@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "check:ts": "tsc --project tsconfig.json --pretty --noEmit",
+    "check:lint": "next lint"
   },
   "dependencies": {
     "@emotion/cache": "^11.13.1",
