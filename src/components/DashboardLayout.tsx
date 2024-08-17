@@ -1,8 +1,9 @@
 "use client"
 import { KeyboardEvent, MouseEvent, ReactNode, useState } from "react"
-import MenuIcon from "@mui/icons-material/Menu"
+import { AccountCircle, Logout, Settings } from "@mui/icons-material"
 import DashboardIcon from "@mui/icons-material/Dashboard"
 import HistoryIcon from "@mui/icons-material/History"
+import MenuIcon from "@mui/icons-material/Menu"
 import {
   AppBar,
   Box,
@@ -18,7 +19,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material"
-import { AccountCircle, Logout, Settings } from "@mui/icons-material"
 import Link from "next/link"
 import { ERoutes } from "@/utils/enums"
 
@@ -67,19 +67,19 @@ export function DashboardLayout({ children }: Props) {
           </IconButton>
           <Typography
             variant="h6"
-            component="h1"
+            component="p"
             textAlign={{ xs: "center", lg: "left" }}
             sx={{
               flexGrow: 1,
             }}
           >
-            <Typography component={"span"} variant={"h6"} color={"primary"}>
+            <Typography component="span" variant="h6" color="primary">
               FUN
             </Typography>
             BAN Status tool
           </Typography>
 
-          <AccountCircle fontSize={"large"} />
+          <AccountCircle fontSize="large" />
         </Toolbar>
       </AppBar>
 

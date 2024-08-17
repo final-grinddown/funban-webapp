@@ -1,4 +1,6 @@
 "use client"
+import { useState } from "react"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import {
   Box,
   Button,
@@ -9,13 +11,11 @@ import {
   Select,
   SelectChangeEvent,
   Typography,
-  useTheme,
 } from "@mui/material"
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"
-import { useState } from "react"
 import { Board } from "@/components/Board"
 
 // TODO: remove mock with data from API
+
 const users = [
   { id: 0, name: "Pepa" },
   { id: 10, name: "Jarda" },
@@ -25,7 +25,6 @@ const users = [
 
 export function BoardScreen() {
   const [user, setUser] = useState(String(users[0].id))
-  const theme = useTheme()
 
   const handleChange = (event: SelectChangeEvent) => {
     setUser(event.target.value)
@@ -33,14 +32,14 @@ export function BoardScreen() {
 
   return (
     <>
-      <Typography variant={"h1"}>Board</Typography>
+      <Typography variant="h1">Board</Typography>
       <Box
         mt={2}
-        display={"flex"}
+        display="flex"
         flexDirection={{ xs: "column", md: "row" }}
-        flexWrap={"wrap"}
+        flexWrap="wrap"
         gap={2}
-        justifyContent={"space-between"}
+        justifyContent="space-between"
       >
         <FormControl sx={{ maxWidth: { md: 220 } }} size="small" fullWidth={true}>
           <InputLabel id="select-current-user">Choose current user</InputLabel>
@@ -65,8 +64,8 @@ export function BoardScreen() {
           fullWidth={true}
         >
           <Button>Create a new note</Button>
-          <Button color={"success"}>Start focus</Button>
-          <Button color={"error"}>End status</Button>
+          <Button color="success">Start focus</Button>
+          <Button color="error">End status</Button>
         </ButtonGroup>
       </Box>
 

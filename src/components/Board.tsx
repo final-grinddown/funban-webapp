@@ -28,7 +28,7 @@ export function Board() {
         direction="row"
         divider={<Divider orientation="vertical" flexItem />}
         spacing={2}
-        minHeight={`calc(100vh - 250px)`}
+        minHeight="calc(100vh - 250px)"
         sx={{ overflowX: "auto" }}
       >
         {columns.map(({ title, items }) => (

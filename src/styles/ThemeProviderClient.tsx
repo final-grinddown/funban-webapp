@@ -1,10 +1,10 @@
 "use client"
 import { ReactNode, useEffect, useState } from "react"
 import { CssBaseline, ThemeProvider } from "@mui/material"
+import { Theme } from "@mui/system"
 import { darkTheme, lightTheme } from "@/styles/theme"
 import { useThemeStore } from "@/utils/store"
 import { TThemeMode } from "@/utils/types"
-import { Theme } from "@mui/system"
 
 const themeMap: Record<Exclude<TThemeMode, "system">, Theme> = {
   light: lightTheme,

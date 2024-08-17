@@ -1,6 +1,6 @@
 import { create } from "zustand"
-import { TThemeMode } from "@/utils/types"
 import { getStoredTheme, removeStoredTheme, setStoredTheme } from "@/utils/storage"
+import { TThemeMode } from "@/utils/types"
 
 interface IThemeState {
   mode: TThemeMode
