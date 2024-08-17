@@ -1,16 +1,35 @@
-import { Box, Divider, Stack, useTheme } from "@mui/material"
+import { Box, Divider, Stack } from "@mui/material"
 import { BoardItem } from "@/components/BoardItem"
 
 export function Board() {
-  const theme = useTheme()
   const columns = [
     {
       title: "NOTE",
-      items: ["NOTE 1", "NOTE 2"],
+      items: [
+        {
+          description: "NOTE 1",
+          user: {
+            name: "John Doe",
+          },
+        },
+        {
+          description: "NOTE 2",
+          user: {
+            name: "Jane Smith",
+          },
+        },
+      ],
     },
     {
       title: "TODO",
-      items: ["TODO 1"],
+      items: [
+        {
+          description: "TODO 1",
+          user: {
+            name: "Emily Johnson",
+          },
+        },
+      ],
     },
     {
       title: "IN PROGRESS",
@@ -18,7 +37,26 @@ export function Board() {
     },
     {
       title: "DONE",
-      items: ["DONE 1", "DONE 2", "DONE 3"],
+      items: [
+        {
+          description: "DONE 1",
+          user: {
+            name: "Michael Brown",
+          },
+        },
+        {
+          description: "DONE 2",
+          user: {
+            name: "Sophia Williams",
+          },
+        },
+        {
+          description: "DONE 3",
+          user: {
+            name: "Liam Davis",
+          },
+        },
+      ],
     },
   ]
 

@@ -143,7 +143,7 @@ export function DashboardLayout({ children }: Props) {
         </Box>
       </Drawer>
 
-      <Container maxWidth={false} sx={{ pt: { xs: 8, sm: 10 }, ml: { lg: "250px" } }}>
+      <Container maxWidth={false} sx={{ pt: { xs: 8, sm: 10 }, ml: { lg: "250px" }, overflowX: "hidden" }}>
         <Box
           sx={{
             flexGrow: 1,

@@ -1,5 +1,5 @@
-import { BoardScreen } from "@/app/screens/BoardScreen"
 import { DashboardLayout } from "@/components/DashboardLayout"
+import { BoardScreen } from "@/screens/BoardScreen"
 
 export default function Board() {
   return (
