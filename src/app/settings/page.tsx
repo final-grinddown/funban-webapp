@@ -1,3 +1,9 @@
+import { DashboardLayout } from "@/components/DashboardLayout"
+
 export default function Settings() {
-  return <div>TODO: LANDING</div>
+  return (
+    <DashboardLayout>
+      <div>TODO: SETTINGS</div>
+    </DashboardLayout>
+  )
 }

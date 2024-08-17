@@ -16,9 +16,11 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  useTheme,
 } from "@mui/material"
 import { AccountCircle, Logout, Settings } from "@mui/icons-material"
-import { theme } from "@/styles/theme"
+import Link from "next/link"
+import { ERoutes } from "@/utils/enums"
 
 interface Props {
   children: ReactNode
@@ -26,7 +28,7 @@ interface Props {
 
 export function DashboardLayout({ children }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
-
+  const theme = useTheme()
   const toggleDrawer = (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
     if (
       event.type === "keydown" &&
@@ -41,10 +43,13 @@ export function DashboardLayout({ children }: Props) {
     <Box sx={{ display: "flex" }}>
       <AppBar
         position="fixed"
-        color={"transparent"}
         sx={{
           zIndex: {
             lg: theme.zIndex.drawer + 1,
+          },
+          background: {
+            xs: theme.palette.background.default,
+            lg: `linear-gradient(to right, transparent 250px, ${theme.palette.background.default} 250px)`,
           },
         }}
         enableColorOnDark={true}
@@ -93,15 +98,15 @@ export function DashboardLayout({ children }: Props) {
       >
         <List>
           <ListItem sx={{ p: 0 }}>
-            <ListItemButton>
+            <ListItemButton component={Link} href={ERoutes.Board}>
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <ListItemText primary="Board" />
             </ListItemButton>
           </ListItem>
           <ListItem sx={{ p: 0 }}>
-            <ListItemButton>
+            <ListItemButton component={Link} href={ERoutes.History}>
               <ListItemIcon>
                 <HistoryIcon />
               </ListItemIcon>
@@ -109,7 +114,7 @@ export function DashboardLayout({ children }: Props) {
             </ListItemButton>
           </ListItem>
           <ListItem sx={{ p: 0 }}>
-            <ListItemButton>
+            <ListItemButton component={Link} href={ERoutes.Settings}>
               <ListItemIcon>
                 <Settings />
               </ListItemIcon>
@@ -117,7 +122,8 @@ export function DashboardLayout({ children }: Props) {
             </ListItemButton>
           </ListItem>
           <ListItem sx={{ p: 0 }}>
-            <ListItemButton>
+            {/*TODO: Implement logout instead of redirection*/}
+            <ListItemButton component={Link} href={ERoutes.SignIn}>
               <ListItemIcon>
                 <Logout />
               </ListItemIcon>

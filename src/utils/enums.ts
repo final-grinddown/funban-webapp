@@ -1,7 +1,7 @@
 export enum ERoutes {
   Landing = "/",
   SignIn = "/sign-in",
-  Dashboard = "/dashboard",
+  Board = "/board",
   History = "/history",
   Settings = "/settings",
 }

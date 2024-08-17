@@ -54,17 +54,18 @@ export const theme = createTheme({
   ...baseTheme,
   typography: {
     h1: {
-      fontSize: "2rem",
+      fontSize: "1.75rem",
       fontWeight: 700,
       [baseTheme.breakpoints.up("sm")]: {
-        fontSize: "2.5rem",
-      },
-      [baseTheme.breakpoints.up("md")]: {
-        fontSize: "3rem",
+        fontSize: "2rem",
       },
       [baseTheme.breakpoints.up("lg")]: {
-        fontSize: "3.5rem",
+        fontSize: "2.5rem",
       },
+    },
+    h2: {
+      fontSize: "1.5rem",
+      fontWeight: 700,
     },
     h6: {
       fontSize: "1.25rem",

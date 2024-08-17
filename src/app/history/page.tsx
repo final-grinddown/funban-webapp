@@ -1,3 +1,9 @@
+import { DashboardLayout } from "@/components/DashboardLayout"
+
 export default function History() {
-  return <div>TODO: HISTORY</div>
+  return (
+    <DashboardLayout>
+      <div>TODO: HISTORY</div>
+    </DashboardLayout>
+  )
 }

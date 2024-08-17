@@ -1,9 +1,10 @@
 import { DashboardLayout } from "@/components/DashboardLayout"
+import { BoardScreen } from "@/app/screens/BoardScreen"
 
-export default function Dashboard() {
+export default function Board() {
   return (
     <DashboardLayout>
-      <div>TODO: DASHBOARD</div>
+      <BoardScreen />
     </DashboardLayout>
   )
 }
