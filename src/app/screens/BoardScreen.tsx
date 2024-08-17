@@ -42,7 +42,7 @@ export function BoardScreen() {
         gap={2}
         justifyContent={"space-between"}
       >
-        <FormControl sx={{ maxWidth: { md: 250 } }} size="small" fullWidth={true}>
+        <FormControl sx={{ maxWidth: { md: 220 } }} size="small" fullWidth={true}>
           <InputLabel id="select-current-user">Choose current user</InputLabel>
           <Select
             labelId="select-current-user"
@@ -61,7 +61,7 @@ export function BoardScreen() {
         <ButtonGroup
           variant="contained"
           aria-label="Board button group"
-          sx={{ maxWidth: { md: 600 } }}
+          sx={{ maxWidth: { md: 580 } }}
           fullWidth={true}
         >
           <Button>Create a new note</Button>
