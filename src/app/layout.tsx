@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter"
 import type { Metadata } from "next"
-import { ThemeProviderClient } from "@/styles/ThemeProviderClient"
+import Provider from "@/app/_provider"
 
 export const metadata: Metadata = {
   title: "Funban",
@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <ThemeProviderClient>{children}</ThemeProviderClient>
+          <Provider>{children}</Provider>
         </AppRouterCacheProvider>
       </body>
     </html>

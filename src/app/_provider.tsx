@@ -2,9 +2,16 @@
 import { ReactNode, useEffect, useState } from "react"
 import { CssBaseline, ThemeProvider } from "@mui/material"
 import { Theme } from "@mui/system"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { SessionProvider } from "next-auth/react"
 import { darkTheme, lightTheme } from "@/styles/theme"
 import { useThemeStore } from "@/utils/store"
 import { TThemeMode } from "@/utils/types"
+
+interface Props {
+  children: ReactNode
+}
 
 const themeMap: Record<Exclude<TThemeMode, "system">, Theme> = {
   light: lightTheme,
@@ -13,25 +20,30 @@ const themeMap: Record<Exclude<TThemeMode, "system">, Theme> = {
 
 const getSystemTheme = () => (window.matchMedia("(prefers-color-scheme: dark)").matches ? darkTheme : lightTheme)
 
-export const ThemeProviderClient = ({ children }: { children: ReactNode }) => {
+export default function Provider({ children }: Props) {
+  const queryClient = new QueryClient()
   const { mode, initializeTheme } = useThemeStore()
   const [isMounted, setIsMounted] = useState(false)
+  const theme = mode === "system" ? getSystemTheme() : themeMap[mode]
 
   useEffect(() => {
     initializeTheme()
     setIsMounted(true)
   }, [initializeTheme])
 
-  const theme = mode === "system" ? getSystemTheme() : themeMap[mode]
-
   if (!isMounted) {
     return <div style={{ visibility: "hidden", height: "100vh" }}>{children}</div>
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+        <ReactQueryDevtools buttonPosition="bottom-left" />
+      </QueryClientProvider>
+    </SessionProvider>
   )
 }
