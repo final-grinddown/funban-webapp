@@ -20,7 +20,7 @@ import {
   useTheme,
 } from "@mui/material"
 import Link from "next/link"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { ERoutes } from "@/utils/enums"
 
 interface Props {
@@ -30,6 +30,8 @@ interface Props {
 export function DashboardLayout({ children }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const theme = useTheme()
+  const { data } = useSession()
+
   const toggleDrawer = (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
     if (
       event.type === "keydown" &&
@@ -80,7 +82,10 @@ export function DashboardLayout({ children }: Props) {
             BAN Status tool
           </Typography>
 
-          <AccountCircle fontSize="large" />
+          <Box display="flex" alignItems="center" gap={2}>
+            {data?.user?.email && <Typography>{data.user.email}</Typography>}
+            <AccountCircle fontSize="large" />
+          </Box>
         </Toolbar>
       </AppBar>
 

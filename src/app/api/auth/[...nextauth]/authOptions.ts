@@ -67,6 +67,30 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }: { session: IExtendedSession; token: IExtendedJWT }): Promise<Session> {
       session.accessToken = token.accessToken
 
+      if (!session.user) {
+        session.user = {}
+      }
+
+      if (token.accessToken) {
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token.accessToken}`,
+            },
+          })
+
+          if (res.ok) {
+            const userData = await res.json()
+            session.user.email = userData.email
+          } else {
+            console.error("Failed to fetch user details:", res.statusText)
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error)
+        }
+      }
+
       return session
     },
   },
