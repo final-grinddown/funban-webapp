@@ -25,7 +25,6 @@ const users = [
 
 export function BoardScreen() {
   const [user, setUser] = useState(String(users[0].id))
-
   const handleChange = (event: SelectChangeEvent) => {
     setUser(event.target.value)
   }

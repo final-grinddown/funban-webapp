@@ -20,6 +20,7 @@ import {
   useTheme,
 } from "@mui/material"
 import Link from "next/link"
+import { signOut } from "next-auth/react"
 import { ERoutes } from "@/utils/enums"
 
 interface Props {
@@ -122,8 +123,7 @@ export function DashboardLayout({ children }: Props) {
             </ListItemButton>
           </ListItem>
           <ListItem sx={{ p: 0 }}>
-            {/*TODO: Implement logout instead of redirection*/}
-            <ListItemButton component={Link} href={ERoutes.SignIn}>
+            <ListItemButton onClick={() => signOut()}>
               <ListItemIcon>
                 <Logout />
               </ListItemIcon>
