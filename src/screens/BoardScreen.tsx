@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material"
 import { Board } from "@/components/Board"
+import { useWebSocket } from "@/hooks/useWebSocket"
 
 // TODO: remove mock with data from API
 
@@ -24,10 +25,14 @@ const users = [
 ]
 
 export function BoardScreen() {
+  const { heartbeatMessage } = useWebSocket()
   const [user, setUser] = useState(String(users[0].id))
   const handleChange = (event: SelectChangeEvent) => {
     setUser(event.target.value)
   }
+
+  // TODO: remove it after login data in UI
+  console.log(heartbeatMessage)
 
   return (
     <>

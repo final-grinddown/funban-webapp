@@ -1,5 +1,4 @@
 "use client"
-import { redirect } from "next/navigation"
 import { useEffect } from "react"
 import { Backdrop, CircularProgress } from "@mui/material"
 import { useRouter } from "next/navigation"
