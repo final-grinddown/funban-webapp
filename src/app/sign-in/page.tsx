@@ -1,16 +1,10 @@
 import { Suspense } from "react"
-import { Backdrop, CircularProgress } from "@mui/material"
+import { BackdropLoading } from "@/components/BackdropLoading"
 import { SignInScreen } from "@/screens/SignInScreen"
 
 export default function SignIn() {
   return (
-    <Suspense
-      fallback={
-        <Backdrop sx={{ color: "#fff", zIndex: 1000 }} open={true}>
-          <CircularProgress color="primary" />
-        </Backdrop>
-      }
-    >
+    <Suspense fallback={<BackdropLoading />}>
       <SignInScreen />
     </Suspense>
   )

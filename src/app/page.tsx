@@ -1,7 +1,7 @@
 "use client"
 import { useEffect } from "react"
-import { Backdrop, CircularProgress } from "@mui/material"
 import { useRouter } from "next/navigation"
+import { BackdropLoading } from "@/components/BackdropLoading"
 import { ERoutes } from "@/utils/enums"
 
 export default function Landing() {
@@ -11,9 +11,5 @@ export default function Landing() {
     router.replace(ERoutes.Board)
   }, [router])
 
-  return (
-    <Backdrop sx={{ color: "#fff", zIndex: 1000 }} open={true}>
-      <CircularProgress color="primary" />
-    </Backdrop>
-  )
+  return <BackdropLoading />
 }
