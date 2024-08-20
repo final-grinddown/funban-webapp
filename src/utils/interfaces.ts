@@ -8,3 +8,28 @@ export interface IExtendedSession extends Session {
 export interface IExtendedJWT extends JWT {
   accessToken?: string
 }
+
+export interface IUser {
+  id: number
+  name: string
+  color: string
+}
+
+export interface IUserAddedOperation {
+  type: "UserAdded"
+  user: IUser
+}
+
+export interface IPatchOperation {
+  ops: IUserAddedOperation[]
+}
+
+export interface IWebSocketMessage {
+  type: "Users" | "Notes" | "Patch"
+  items?: IUser[]
+  ops?: IPatchOperation[]
+}
+
+export interface IServerMessage {
+  type: "Users" | "Notes" | "Patch"
+}

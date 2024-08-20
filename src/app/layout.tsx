@@ -2,6 +2,7 @@ import { ReactNode } from "react"
 import type { Metadata } from "next"
 import Provider from "@/app/_provider"
 import { AuthProvider } from "@/context/AuthProvider"
+import { WebSocketProvider } from "@/context/WebSocketProvider"
 
 export const metadata: Metadata = {
   title: "Funban",
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <Provider>{children}</Provider>
+          <WebSocketProvider>
+            <Provider>{children}</Provider>
+          </WebSocketProvider>
         </AuthProvider>
       </body>
     </html>

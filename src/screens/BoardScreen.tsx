@@ -13,26 +13,18 @@ import {
   Typography,
 } from "@mui/material"
 import { Board } from "@/components/Board"
-import { useWebSocket } from "@/hooks/useWebSocket"
+import { IUser } from "@/utils/interfaces"
 
-// TODO: remove mock with data from API
+interface Props {
+  users: IUser[]
+}
 
-const users = [
-  { id: 0, name: "Pepa" },
-  { id: 10, name: "Jarda" },
-  { id: 20, name: "Marie" },
-  { id: 30, name: "Honza" },
-]
-
-export function BoardScreen() {
-  const { heartbeatMessage } = useWebSocket()
+export function BoardScreen({ users }: Props) {
   const [user, setUser] = useState(String(users[0].id))
   const handleChange = (event: SelectChangeEvent) => {
     setUser(event.target.value)
   }
 
-  // TODO: remove it after login data in UI
-  console.log(heartbeatMessage)
 
   return (
     <>
