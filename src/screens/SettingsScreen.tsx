@@ -1,18 +1,56 @@
 "use client"
-import { ReactNode, SyntheticEvent, useState } from "react"
-import { Box, Tab, Tabs, Typography, useTheme } from "@mui/material"
+
+import { ReactNode, SyntheticEvent, useEffect, useState } from "react"
+import { Box, CircularProgress, Grid, Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { useRouter } from "next/navigation"
 import { IUser } from "@/utils/interfaces"
 
 interface Props {
   users: IUser[]
 }
 
+const tabNames = ["account", "team-management", "board-configuration"]
+
+const tabNameToIndex: { [key: string]: number } = {
+  account: 0,
+  "team-management": 1,
+  "board-configuration": 2,
+}
+
+const indexToTabName: { [key: number]: string } = {
+  0: "account",
+  1: "team-management",
+  2: "board-configuration",
+}
+
 export function SettingsScreen({ users }: Props) {
   const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
+  const router = useRouter()
+
   const [value, setValue] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const hash = window.location.hash.substring(1)
+    if (hash && tabNameToIndex[hash] !== undefined) {
+      setValue(tabNameToIndex[hash])
+    }
+    setLoading(false)
+  }, [])
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
+    const tabName = indexToTabName[newValue]
+    router.push(`#${tabName}`, { scroll: false })
+  }
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    )
   }
 
   return (
@@ -23,24 +61,30 @@ export function SettingsScreen({ users }: Props) {
           sx={{ borderBottom: 1, borderColor: "divider", borderTopRightRadius: 4, borderTopLeftRadius: 4 }}
           bgcolor={theme.palette.background.paper}
         >
-          <Tabs value={value} onChange={handleChange} aria-label="settings tabs" variant="fullWidth">
-            <Tab label="Account" {...a11yProps("account")} />
-            <Tab label="Team Management" {...a11yProps("team-management")} />
-            <Tab label="Board Configuration" {...a11yProps("board-configuration")} />
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="settings tabs"
+            variant="fullWidth"
+            orientation={isSmallScreen ? "vertical" : "horizontal"}
+          >
+            {tabNames.map((name) => (
+              <Tab key={name} label={name.replace("-", " ").toUpperCase()} {...a11yProps(name)} />
+            ))}
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          {/* Account settings content goes here */}
           <Typography variant="h6">Account Settings</Typography>
           {/* Add your account-specific UI, like name, avatar, theme mode toggle */}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          {/* Team management content goes here */}
-          <Typography variant="h6">Team Management</Typography>
-          {/* Add UI for adding/editing/deleting team members */}
+          <Grid p={0}>
+            <Grid item bgcolor="blue">
+              <Typography variant="h6">Team Management</Typography>
+            </Grid>
+          </Grid>
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          {/* Board configuration content goes here */}
           <Typography variant="h6">Board Configuration</Typography>
           {/* Add UI for board column settings, like column names and counts */}
         </CustomTabPanel>
@@ -60,7 +104,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
   return (
     <div role="tabpanel" hidden={value !== index} id={`tabpanel-${index}`} aria-labelledby={`tab-${index}`} {...other}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
     </div>
   )
 }
