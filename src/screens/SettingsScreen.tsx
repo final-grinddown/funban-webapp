@@ -1,8 +1,9 @@
 "use client"
 
 import { ReactNode, SyntheticEvent, useEffect, useState } from "react"
-import { Box, CircularProgress, Grid, Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Box, CircularProgress, Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { useRouter } from "next/navigation"
+import { TeamManagement } from "@/components/TeamManagement"
 import { IUser } from "@/utils/interfaces"
 
 interface Props {
@@ -78,11 +79,7 @@ export function SettingsScreen({ users }: Props) {
           {/* Add your account-specific UI, like name, avatar, theme mode toggle */}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <Grid p={0}>
-            <Grid item bgcolor="blue">
-              <Typography variant="h6">Team Management</Typography>
-            </Grid>
-          </Grid>
+          <TeamManagement users={users} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
           <Typography variant="h6">Board Configuration</Typography>
