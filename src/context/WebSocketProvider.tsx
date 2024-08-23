@@ -1,6 +1,6 @@
 "use client"
-
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
+import { Alert, Snackbar } from "@mui/material"
 import { useSession } from "next-auth/react"
 import { IExtendedSession, IUser } from "@/utils/interfaces"
 
@@ -19,6 +19,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<IUser[]>([])
   const [socketUrl, setSocketUrl] = useState<string | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("")
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -61,14 +63,20 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                 setUsers((prevUsers) =>
                   prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)),
                 )
+                setSnackbarMessage("User name updated successfully!")
+                setSnackbarOpen(true)
                 break
               case "UserColorUpdated":
                 setUsers((prevUsers) =>
                   prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)),
                 )
+                setSnackbarMessage("User color updated successfully!")
+                setSnackbarOpen(true)
                 break
               case "UserRemoved":
                 setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
+                setSnackbarMessage("User removed successfully!")
+                setSnackbarOpen(true)
                 break
               default:
                 console.error("Unknown operation", op)
@@ -119,9 +127,18 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  function handleSnackbarClose() {
+    setSnackbarOpen(false)
+  }
+
   return (
     <WebSocketContext.Provider value={{ users, sendMessage, connectionStatus: getConnectionStatus() }}>
       {children}
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="success" variant="filled" sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </WebSocketContext.Provider>
   )
 }
