@@ -20,17 +20,18 @@ import {
   useTheme,
 } from "@mui/material"
 import Link from "next/link"
-import { signOut, useSession } from "next-auth/react"
+import { signOut } from "next-auth/react"
 import { ERoutes } from "@/utils/enums"
+import { removeStoredUserEmail } from "@/utils/storage"
 
 interface Props {
   children: ReactNode
+  userEmail: string
 }
 
-export function DashboardLayout({ children }: Props) {
+export function DashboardLayout({ children, userEmail }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const theme = useTheme()
-  const { data } = useSession()
 
   const toggleDrawer = (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
     if (
@@ -40,6 +41,11 @@ export function DashboardLayout({ children }: Props) {
       return
     }
     setDrawerOpen(open)
+  }
+
+  const handleLogout = () => {
+    signOut()
+    removeStoredUserEmail()
   }
 
   return (
@@ -83,7 +89,7 @@ export function DashboardLayout({ children }: Props) {
           </Typography>
 
           <Box display="flex" alignItems="center" gap={2}>
-            {data?.user?.email && <Typography>{data.user.email}</Typography>}
+            {userEmail && <Typography display={{ xs: "none", lg: "inline" }}>{userEmail}</Typography>}
             <AccountCircle fontSize="large" />
           </Box>
         </Toolbar>
@@ -128,7 +134,7 @@ export function DashboardLayout({ children }: Props) {
             </ListItemButton>
           </ListItem>
           <ListItem sx={{ p: 0 }}>
-            <ListItemButton onClick={() => signOut()}>
+            <ListItemButton onClick={handleLogout}>
               <ListItemIcon>
                 <Logout />
               </ListItemIcon>
