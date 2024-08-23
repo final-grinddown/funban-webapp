@@ -72,8 +72,6 @@ export function TeamManagement({ users }: Props) {
     }
   }
 
-  console.log(existingNames)
-
   return (
     <Grid container spacing={2}>
       {users.map(({ id, name, color }) => (
