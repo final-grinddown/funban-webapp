@@ -75,6 +75,19 @@ export const theme = createTheme({
       fontWeight: 700,
     },
   },
+  components: {
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          position: "absolute",
+          top: "44px",
+          left: "14px",
+          margin: "0",
+          visibility: "visible",
+        },
+      },
+    },
+  },
 })
 
 export const lightTheme = createTheme({

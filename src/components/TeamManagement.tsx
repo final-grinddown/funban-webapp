@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Grid } from "@mui/material"
-import { createDeleteUser, createUpdateUserColorMessage } from "@/app/api/websocket"
+import { createDeleteUser, createUpdateUserColorMessage, createUpdateUserNameMessage } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { IUser } from "@/utils/interfaces"
@@ -22,6 +22,9 @@ export function TeamManagement({ users }: Props) {
   const [currentName, setCurrentName] = useState<string>("")
   const [currentColor, setCurrentColor] = useState<string>("")
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+
+  // Create an array of existing names from users prop
+  const existingNames = useMemo(() => users.map((user) => user.name), [users])
 
   const handleEditNameClick = (id: number, name: string) => {
     setEditingNameId(id)
@@ -46,8 +49,11 @@ export function TeamManagement({ users }: Props) {
   }
 
   const handleSaveName = (newName: string) => {
-    console.log(`Saving new name for user ID ${editingNameId}: ${newName}`)
-    setEditingNameId(null)
+    if (editingNameId !== null) {
+      const message = createUpdateUserNameMessage(editingNameId, newName)
+      sendMessage(message)
+      setEditingNameId(null)
+    }
   }
 
   const handleSaveColor = (newColor: string) => {
@@ -65,6 +71,8 @@ export function TeamManagement({ users }: Props) {
       handleCloseDeleteModal()
     }
   }
+
+  console.log(existingNames)
 
   return (
     <Grid container spacing={2}>
@@ -86,6 +94,7 @@ export function TeamManagement({ users }: Props) {
         initialName={currentName}
         onClose={() => setEditingNameId(null)}
         onSave={handleSaveName}
+        existingNames={existingNames}
       />
 
       <ColorEditModal

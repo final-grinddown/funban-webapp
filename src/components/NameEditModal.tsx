@@ -1,31 +1,45 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField } from "@mui/material"
+import { Controller, useForm } from "react-hook-form"
 
 interface Props {
   isOpen: boolean
   initialName: string
+  existingNames: string[]
   onClose: () => void
   onSave: (newName: string) => void
 }
 
-export function NameEditModal({ isOpen, initialName, onClose, onSave }: Props) {
-  const [name, setName] = useState(initialName)
+interface FormInputs {
+  name: string
+}
 
-  const handleSave = () => {
-    onSave(name)
+export function NameEditModal({ isOpen, initialName, existingNames, onClose, onSave }: Props) {
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors, isValid },
+  } = useForm<FormInputs>({
+    defaultValues: { name: initialName },
+    mode: "onChange",
+  })
+
+  const onSubmit = (data: FormInputs) => {
+    onSave(data.name)
     onClose()
   }
 
   useEffect(() => {
     if (isOpen) {
-      setName(initialName)
+      setValue("name", initialName)
     }
-  }, [initialName, isOpen])
+  }, [initialName, isOpen, setValue])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth={true}>
-      <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 0 }}>
         Edit Name
         <IconButton
           aria-label="close"
@@ -38,14 +52,41 @@ export function NameEditModal({ isOpen, initialName, onClose, onSave }: Props) {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
-        <TextField value={name} onChange={(e) => setName(e.target.value)} variant="outlined" size="small" fullWidth />
+      <DialogContent sx={{ height: { xs: "100px", sm: "80px" } }}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="name"
+            control={control}
+            rules={{
+              required: "Name is required.",
+              maxLength: { value: 20, message: "Name cannot exceed 20 characters." },
+              validate: {
+                noLeadingSpaces: (value) => !/^\s/.test(value) || "Name cannot start with a space.",
+                uniqueName: (value) =>
+                  !existingNames.filter((name) => name !== initialName).includes(value) ||
+                  "Name already exists. Please choose a different name.",
+              },
+            }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Name"
+                variant="outlined"
+                size="small"
+                fullWidth={true}
+                error={!!error}
+                helperText={error ? error.message : ""}
+                sx={{ mt: 2 }}
+              />
+            )}
+          />
+        </form>
       </DialogContent>
       <DialogActions sx={{ px: 3 }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
+        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isValid}>
           Save
         </Button>
       </DialogActions>
