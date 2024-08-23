@@ -1,21 +1,21 @@
 "use client"
 
-import React, { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { useSession } from "next-auth/react"
 import { IExtendedSession, IUser } from "@/utils/interfaces"
 
 interface WebSocketContextType {
   users: IUser[]
-  notes: any[]
   sendMessage: (message: string) => void
   connectionStatus: string
 }
+
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined)
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession()
-  const [notes, setNotes] = useState<any[]>([])
   const [users, setUsers] = useState<IUser[]>([])
   const [socketUrl, setSocketUrl] = useState<string | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
@@ -25,18 +25,16 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       console.log("Session authenticated, setting WebSocket URL")
       const extendedSession = session as IExtendedSession
       if (extendedSession?.accessToken) {
-        setSocketUrl(`${process.env.NEXT_PUBLIC_WS_URL}?token=${extendedSession.accessToken}`)
+        setSocketUrl(`${WS_URL}?token=${extendedSession.accessToken}`)
       }
     } else {
-      // If session is not authenticated or session doesn't exist, close the WebSocket connection
       console.log("Session not authenticated or no session found, closing WebSocket if open")
       if (socketRef.current) {
         socketRef.current.close()
-        socketRef.current = null // Ensure the socket is cleared
+        socketRef.current = null
       }
       setSocketUrl(null)
       setUsers([])
-      setNotes([])
     }
   }, [session, status])
 
@@ -56,37 +54,17 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         if (msg.type === "Patch") {
           msg.ops.forEach((op: any) => {
             switch (op.type) {
-              case "NoteAdded":
-                // Handle NoteAdded
-                break
-              case "NoteTextUpdated":
-                // Handle NoteTextUpdated
-                break
-              case "NoteOrderChanged":
-                // Handle NoteOrderChanged
-                break
-              case "NoteRemoved":
-                // Handle NoteRemoved
-                break
               case "UserAdded":
                 setUsers((prevUsers) => [...prevUsers, op.user])
                 break
-              case "UserNameUpdated":
-                // Handle UserNameUpdated
-                break
-              case "UserColorUpdated":
-                // Handle UserColorUpdated
-                break
               case "UserRemoved":
-                // Handle UserRemoved
+                setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
                 break
               default:
                 console.error("Unknown operation", op)
                 break
             }
           })
-        } else if (msg.type === "Notes") {
-          setNotes(msg.items)
         } else if (msg.type === "Users") {
           setUsers(msg.items)
         }
@@ -132,7 +110,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <WebSocketContext.Provider value={{ users, notes, sendMessage, connectionStatus: getConnectionStatus() }}>
+    <WebSocketContext.Provider value={{ users, sendMessage, connectionStatus: getConnectionStatus() }}>
       {children}
     </WebSocketContext.Provider>
   )

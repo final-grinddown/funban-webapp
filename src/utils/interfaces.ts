@@ -33,3 +33,8 @@ export interface IWebSocketMessage {
 export interface IServerMessage {
   type: "Users" | "Notes" | "Patch"
 }
+
+export interface IRemoveUser {
+  type: "RemoveUser"
+  id: number
+}

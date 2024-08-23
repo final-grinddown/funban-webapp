@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Grid } from "@mui/material"
+import { createDeleteUser } from "@/app/api/websocket"
+import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { IUser } from "@/utils/interfaces"
 import { ColorEditModal } from "./ColorEditModal"
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export function TeamManagement({ users }: Props) {
+  const { sendMessage } = useWebSocketContext()
   const [editingNameId, setEditingNameId] = useState<number | null>(null)
   const [editingColorId, setEditingColorId] = useState<number | null>(null)
   const [deletingUserId, setDeletingUserId] = useState<number | null>(null)
@@ -54,7 +57,8 @@ export function TeamManagement({ users }: Props) {
 
   const confirmDelete = () => {
     if (deletingUserId !== null) {
-      console.log(`User with ID ${deletingUserId} deleted.`)
+      const deleteMessage = createDeleteUser(deletingUserId)
+      sendMessage(deleteMessage)
       handleCloseDeleteModal()
     }
   }
