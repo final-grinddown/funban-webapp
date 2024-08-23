@@ -57,6 +57,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
               case "UserAdded":
                 setUsers((prevUsers) => [...prevUsers, op.user])
                 break
+              case "UserColorUpdated":
+                setUsers((prevUsers) =>
+                  prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)),
+                )
+                break
               case "UserRemoved":
                 setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
                 break

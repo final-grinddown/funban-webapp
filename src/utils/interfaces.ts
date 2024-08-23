@@ -34,6 +34,12 @@ export interface IServerMessage {
   type: "Users" | "Notes" | "Patch"
 }
 
+export interface IUpdateUserColor {
+  type: "UpdateUserColor"
+  id: number
+  color: string
+}
+
 export interface IRemoveUser {
   type: "RemoveUser"
   id: number

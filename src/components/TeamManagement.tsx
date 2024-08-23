@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Grid } from "@mui/material"
-import { createDeleteUser } from "@/app/api/websocket"
+import { createDeleteUser, createUpdateUserColorMessage } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { IUser } from "@/utils/interfaces"
@@ -51,8 +51,11 @@ export function TeamManagement({ users }: Props) {
   }
 
   const handleSaveColor = (newColor: string) => {
-    console.log(`Saving new color for user ID ${editingColorId}: ${newColor}`)
-    setEditingColorId(null)
+    if (editingColorId !== null) {
+      const updateColorMessage = createUpdateUserColorMessage(editingColorId, newColor)
+      sendMessage(updateColorMessage)
+      setEditingColorId(null)
+    }
   }
 
   const confirmDelete = () => {

@@ -2,6 +2,7 @@ import ChangeCircleIcon from "@mui/icons-material/ChangeCircle"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import { Box, Button, Card, Grid, IconButton, Typography, useTheme } from "@mui/material"
+import { matchColorName } from "@/utils/helpers"
 
 interface Props {
   id: number
@@ -35,20 +36,14 @@ export function TeamMemberCard({ id, name, color, onEditName, onEditColor, onDel
           <Typography variant="h6" component="p" color={theme.palette.text.primary} gutterBottom={false}>
             Color:
           </Typography>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box display="flex" alignItems="center">
+            <Box display="flex" alignItems="center">
+              <Box width={24} height={24} bgcolor={matchColorName(color, availableColors)} borderRadius="50%" mr={1} />
+            </Box>
             <Typography variant="body1" component="p" textTransform="capitalize" color={theme.palette.text.primary}>
               {color}
             </Typography>
-            <Box display="flex" alignItems="center" flexGrow={1}>
-              <Box
-                width={24}
-                height={24}
-                bgcolor={availableColors.find((c) => c.name.toLowerCase() === color)?.value ?? color}
-                borderRadius="50%"
-                ml={1}
-              />
-            </Box>
-            <IconButton onClick={() => onEditColor(id)} color="default">
+            <IconButton onClick={() => onEditColor(id)} color="default" sx={{ ml: "auto" }}>
               <ChangeCircleIcon />
             </IconButton>
           </Box>
