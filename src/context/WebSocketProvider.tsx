@@ -58,6 +58,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             switch (op.type) {
               case "UserAdded":
                 setUsers((prevUsers) => [...prevUsers, op.user])
+                setSnackbarMessage("User added successfully!")
+                setSnackbarOpen(true)
                 break
               case "UserNameUpdated":
                 setUsers((prevUsers) =>

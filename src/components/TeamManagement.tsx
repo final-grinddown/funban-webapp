@@ -1,9 +1,16 @@
 import { useMemo, useState } from "react"
-import { Grid } from "@mui/material"
-import { createDeleteUser, createUpdateUserColorMessage, createUpdateUserNameMessage } from "@/app/api/websocket"
+import AddIcon from "@mui/icons-material/Add"
+import { Button, Grid } from "@mui/material"
+import {
+  createAddUserMessage,
+  createDeleteUser,
+  createUpdateUserColorMessage,
+  createUpdateUserNameMessage,
+} from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { IUser } from "@/utils/interfaces"
+import { AddNewTeamMemberModal } from "./AddNewTeamMemberModal"
 import { ColorEditModal } from "./ColorEditModal"
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal"
 import { NameEditModal } from "./NameEditModal"
@@ -22,9 +29,16 @@ export function TeamManagement({ users }: Props) {
   const [currentName, setCurrentName] = useState<string>("")
   const [currentColor, setCurrentColor] = useState<string>("")
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   // Create an array of existing names from users prop
   const existingNames = useMemo(() => users.map((user) => user.name), [users])
+
+  const handleAddNewUser = (name: string, color: string) => {
+    const addUserMessage = createAddUserMessage(name, color)
+    sendMessage(addUserMessage)
+    setIsAddModalOpen(false)
+  }
 
   const handleEditNameClick = (id: number, name: string) => {
     setEditingNameId(id)
@@ -45,7 +59,7 @@ export function TeamManagement({ users }: Props) {
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false)
-    setDeletingUserId(null) // Reset only the userId, keep the userName
+    setDeletingUserId(null)
   }
 
   const handleSaveName = (newName: string) => {
@@ -73,42 +87,54 @@ export function TeamManagement({ users }: Props) {
   }
 
   return (
-    <Grid container spacing={2}>
-      {users.map(({ id, name, color }) => (
-        <TeamMemberCard
-          key={id}
-          id={id}
-          name={name}
-          color={color}
-          availableColors={availableColors}
-          onEditName={() => handleEditNameClick(id, name)}
-          onEditColor={() => handleEditColorClick(id, color)}
-          onDelete={() => handleDeleteClick(id, name)}
+    <>
+      <Button variant="contained" sx={{ mb: 2 }} startIcon={<AddIcon />} onClick={() => setIsAddModalOpen(true)}>
+        Add new team member
+      </Button>
+      <Grid container spacing={2}>
+        {users.map(({ id, name, color }) => (
+          <TeamMemberCard
+            key={id}
+            id={id}
+            name={name}
+            color={color}
+            availableColors={availableColors}
+            onEditName={() => handleEditNameClick(id, name)}
+            onEditColor={() => handleEditColorClick(id, color)}
+            onDelete={() => handleDeleteClick(id, name)}
+          />
+        ))}
+
+        <AddNewTeamMemberModal
+          isOpen={isAddModalOpen}
+          existingNames={existingNames}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleAddNewUser}
         />
-      ))}
 
-      <NameEditModal
-        isOpen={editingNameId !== null}
-        initialName={currentName}
-        onClose={() => setEditingNameId(null)}
-        onSave={handleSaveName}
-        existingNames={existingNames}
-      />
+        <NameEditModal
+          isOpen={editingNameId !== null}
+          initialName={currentName}
+          onClose={() => setEditingNameId(null)}
+          onSave={handleSaveName}
+          existingNames={existingNames}
+        />
 
-      <ColorEditModal
-        isOpen={editingColorId !== null}
-        currentColor={currentColor}
-        availableColors={availableColors}
-        onClose={() => setEditingColorId(null)}
-        onSave={handleSaveColor}
-      />
+        <ColorEditModal
+          isOpen={editingColorId !== null}
+          currentColor={currentColor}
+          availableColors={availableColors}
+          onClose={() => setEditingColorId(null)}
+          onSave={handleSaveColor}
+        />
 
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        userName={deletingUserName || ""}
-        onClose={handleCloseDeleteModal}
-        onConfirm={confirmDelete}
-      />
-    </Grid>
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          userName={deletingUserName || ""}
+          onClose={handleCloseDeleteModal}
+          onConfirm={confirmDelete}
+        />
+      </Grid>
+    </>
   )
 }

@@ -1,4 +1,14 @@
-import { IRemoveUser, IUpdateUserColor, IUpdateUserName } from "@/utils/interfaces"
+import { IAddUser, IRemoveUser, IUpdateUserColor, IUpdateUserName } from "@/utils/interfaces"
+
+export function createAddUserMessage(name: string, color: string): string {
+  const action: IAddUser = {
+    type: "AddUser",
+    name,
+    color,
+  }
+
+  return JSON.stringify(action)
+}
 
 export function createUpdateUserNameMessage(id: number, name: string): string {
   const action: IUpdateUserName = {
@@ -6,6 +16,7 @@ export function createUpdateUserNameMessage(id: number, name: string): string {
     id,
     name,
   }
+
   return JSON.stringify(action)
 }
 

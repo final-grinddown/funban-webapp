@@ -91,18 +91,22 @@ export function SettingsScreen({ users }: Props) {
   )
 }
 
-interface TabPanelProps {
+interface ITabPanelProps {
   children?: ReactNode
   index: number
   value: number
 }
 
-function CustomTabPanel(props: TabPanelProps) {
+function CustomTabPanel(props: ITabPanelProps) {
   const { children, value, index, ...other } = props
 
   return (
     <div role="tabpanel" hidden={value !== index} id={`tabpanel-${index}`} aria-labelledby={`tab-${index}`} {...other}>
-      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
+      {value === index && (
+        <Box p={0} display="flex" flexDirection="column" alignItems="flex-end">
+          {children}
+        </Box>
+      )}
     </div>
   )
 }
