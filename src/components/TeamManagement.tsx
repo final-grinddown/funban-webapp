@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import AddIcon from "@mui/icons-material/Add"
-import { Button, Grid } from "@mui/material"
+import { Box, Button, Grid } from "@mui/material"
 import {
   createAddUserMessage,
   createDeleteUser,
@@ -87,7 +87,7 @@ export function TeamManagement({ users }: Props) {
   }
 
   return (
-    <>
+    <Box display="flex" flexDirection="column" alignItems="flex-end">
       <Button variant="contained" sx={{ mb: 2 }} startIcon={<AddIcon />} onClick={() => setIsAddModalOpen(true)}>
         Add new team member
       </Button>
@@ -135,6 +135,6 @@ export function TeamManagement({ users }: Props) {
           onConfirm={confirmDelete}
         />
       </Grid>
-    </>
+    </Box>
   )
 }

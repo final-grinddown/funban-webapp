@@ -102,11 +102,7 @@ function CustomTabPanel(props: ITabPanelProps) {
 
   return (
     <div role="tabpanel" hidden={value !== index} id={`tabpanel-${index}`} aria-labelledby={`tab-${index}`} {...other}>
-      {value === index && (
-        <Box p={0} display="flex" flexDirection="column" alignItems="flex-end">
-          {children}
-        </Box>
-      )}
+      {children}
     </div>
   )
 }
