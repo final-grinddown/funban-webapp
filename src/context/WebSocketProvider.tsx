@@ -2,10 +2,11 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { Alert, Snackbar } from "@mui/material"
 import { useSession } from "next-auth/react"
-import { IExtendedSession, IUser } from "@/utils/interfaces"
+import { IExtendedSession, INote, IUser } from "@/utils/interfaces"
 
 interface WebSocketContextType {
   users: IUser[]
+  notes: INote[]
   sendMessage: (message: string) => void
   connectionStatus: string
 }
@@ -17,6 +18,7 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(undefin
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession()
   const [users, setUsers] = useState<IUser[]>([])
+  const [notes, setNotes] = useState<INote[]>([])
   const [socketUrl, setSocketUrl] = useState<string | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -37,6 +39,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       }
       setSocketUrl(null)
       setUsers([])
+      setNotes([])
     }
   }, [session, status])
 
@@ -56,6 +59,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         if (msg.type === "Patch") {
           msg.ops.forEach((op: any) => {
             switch (op.type) {
+              // User Operations
               case "UserAdded":
                 setUsers((prevUsers) => [...prevUsers, op.user])
                 setSnackbarMessage("User added successfully!")
@@ -65,6 +69,9 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                 setUsers((prevUsers) =>
                   prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)),
                 )
+                setNotes((prevNotes) =>
+                  prevNotes.map((note) => (note.owner_id === op.id ? { ...note, name: op.name } : note)),
+                )
                 setSnackbarMessage("User name updated successfully!")
                 setSnackbarOpen(true)
                 break
@@ -72,11 +79,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                 setUsers((prevUsers) =>
                   prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)),
                 )
+                setNotes((prevNotes) =>
+                  prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
+                )
                 setSnackbarMessage("User color updated successfully!")
                 setSnackbarOpen(true)
                 break
               case "UserRemoved":
                 setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
+                setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
                 setSnackbarMessage("User removed successfully!")
                 setSnackbarOpen(true)
                 break
@@ -87,6 +98,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           })
         } else if (msg.type === "Users") {
           setUsers(msg.items)
+        } else if (msg.type === "Notes") {
+          setNotes(msg.items)
         }
       }
 
@@ -115,6 +128,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   function getConnectionStatus(): string {
     if (!socketRef.current) return "Uninstantiated"
+
     switch (socketRef.current.readyState) {
       case WebSocket.CONNECTING:
         return "Connecting"
@@ -134,7 +148,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <WebSocketContext.Provider value={{ users, sendMessage, connectionStatus: getConnectionStatus() }}>
+    <WebSocketContext.Provider value={{ users, notes, sendMessage, connectionStatus: getConnectionStatus() }}>
       {children}
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" variant="filled" sx={{ width: "100%" }}>
@@ -147,8 +161,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
 export function useWebSocketContext() {
   const context = useContext(WebSocketContext)
+
   if (context === undefined) {
     throw new Error("useWebSocketContext must be used within a WebSocketProvider")
   }
+
   return context
 }

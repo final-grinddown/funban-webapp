@@ -1,35 +1,56 @@
-import MoreVertIcon from "@mui/icons-material/MoreVert"
-import { Avatar, Card, CardContent, CardHeader, IconButton, ListItem, useTheme } from "@mui/material"
-import Image from "next/image"
-import { TBoardItem } from "@/utils/types"
+import EditNoteIcon from "@mui/icons-material/EditNote"
+import { Avatar, Card, CardContent, CardHeader, IconButton, Typography } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
+import { availableColors } from "@/utils/constants"
+import { matchColorName } from "@/utils/helpers"
 
 interface Props {
-  user: TBoardItem["user"]
-  description: TBoardItem["description"]
+  text: string
+  name: string
+  color: string
+  owner_id: number
+  state: string
+  index: number
+  updated: Date
+  created: Date
+  avatarUrl?: string
 }
 
-export function BoardItemCard({ description, user }: Props) {
+export function BoardItemCard({ text, name, color, owner_id, state, index, updated, created, avatarUrl }: Props) {
   const theme = useTheme()
-  
+  const matchedColor = matchColorName(color, availableColors) || "#000000"
+  const avatarInitial = name.charAt(0).toUpperCase()
+
+  // Get a contrast color based on the background color
+  const contrastColor = theme.palette.getContrastText(matchedColor)
+
   return (
-    <ListItem>
-      <Card variant="elevation" sx={{ width: "100%" }}>
-        <CardHeader
-          title={user.name}
-          sx={{ bgcolor: theme.palette.success.dark, py: 1 }}
-          avatar={
-            <Avatar aria-label="issue card" sx={{ width: 32, height: 32 }}>
-              {user.avatar ? <Image src={user.avatar} alt={user.name} /> : user.name.charAt(0)}
-            </Avatar>
-          }
-          action={
-            <IconButton aria-label="settings">
-              <MoreVertIcon />
+    <Card elevation={4} sx={{ m: 2 }}>
+      <CardHeader
+        avatar={<Avatar src={avatarUrl}>{!avatarUrl && avatarInitial}</Avatar>}
+        title={
+          <Typography
+            variant="h6"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              color: alpha(contrastColor, 0.85),
+            }}
+          >
+            {name}
+            <IconButton sx={{ color: contrastColor, border: `2px solid ${alpha(contrastColor, 0.75)}` }}>
+              <EditNoteIcon />
             </IconButton>
-          }
-        />
-        <CardContent sx={{ p: 2 }}>{description}</CardContent>
-      </Card>
-    </ListItem>
+          </Typography>
+        }
+        sx={{ bgcolor: alpha(matchedColor, 0.75) }}
+      />
+      <CardContent sx={{ p: 2 }}>
+        <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+          {text}
+        </Typography>
+      </CardContent>
+    </Card>
   )
 }

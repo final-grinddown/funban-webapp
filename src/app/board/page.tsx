@@ -7,7 +7,7 @@ import { BoardScreen } from "@/screens/BoardScreen"
 
 export default function Board() {
   const { data } = useSession()
-  const { users } = useWebSocketContext()
+  const { users, notes } = useWebSocketContext()
 
   if (!data?.user?.email) {
     return <BackdropLoading />
@@ -15,7 +15,11 @@ export default function Board() {
 
   return (
     <DashboardLayout userEmail={data.user.email}>
-      {users.length === 0 ? <BackdropLoading isInDashboard={true} /> : <BoardScreen users={users} />}
+      {users.length === 0 && notes.length === 0 ? (
+        <BackdropLoading isInDashboard={true} />
+      ) : (
+        <BoardScreen users={users} notes={notes} />
+      )}
     </DashboardLayout>
   )
 }

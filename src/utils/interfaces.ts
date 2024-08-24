@@ -56,3 +56,15 @@ export interface IRemoveUser {
   type: "RemoveUser"
   id: number
 }
+
+export interface INote {
+  id: number
+  text: string
+  name: string
+  owner_id: number
+  color: string
+  state: string
+  index: number
+  updated: Date
+  created: Date
+}

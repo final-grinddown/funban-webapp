@@ -13,18 +13,18 @@ import {
   Typography,
 } from "@mui/material"
 import { Board } from "@/components/Board"
-import { IUser } from "@/utils/interfaces"
+import { INote, IUser } from "@/utils/interfaces"
 
 interface Props {
   users: IUser[]
+  notes: INote[]
 }
 
-export function BoardScreen({ users }: Props) {
+export function BoardScreen({ users, notes }: Props) {
   const [user, setUser] = useState(String(users[0].id))
   const handleChange = (event: SelectChangeEvent) => {
     setUser(event.target.value)
   }
-
 
   return (
     <>
@@ -65,7 +65,7 @@ export function BoardScreen({ users }: Props) {
         </ButtonGroup>
       </Box>
 
-      <Board />
+      <Board notes={notes} />
     </>
   )
 }
