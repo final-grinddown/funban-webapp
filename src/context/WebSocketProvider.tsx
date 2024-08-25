@@ -111,6 +111,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           setSnackbarMessage("User removed successfully!")
           setSnackbarOpen(true)
           break
+        case "NoteTextUpdated":
+          setNotes((prevNotes) =>
+            prevNotes.map((note) =>
+              note.id === op.id ? { ...note, text: op.text, updated: new Date().toISOString() } : note,
+            ),
+          )
+          setSnackbarMessage("Note text updated successfully!")
+          setSnackbarOpen(true)
+          break
         default:
           console.error("Unknown operation", op)
           break

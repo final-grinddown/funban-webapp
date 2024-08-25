@@ -65,6 +65,19 @@ export interface INote {
   color: string
   state: string
   index: number
-  updated: Date
-  created: Date
+  updated: string
+  created: string
+}
+
+export interface IUpdateNoteDetail {
+  type: "UpdateNoteDetail"
+  id: number
+  text: string
+  destination_status: string
+}
+
+export interface IUpdateNoteText {
+  type: "UpdateNoteText"
+  id: number
+  text: string
 }
