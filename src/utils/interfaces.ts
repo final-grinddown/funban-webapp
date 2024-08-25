@@ -81,3 +81,10 @@ export interface IUpdateNoteText {
   id: number
   text: string
 }
+
+export interface IHistoryItem {
+  id: number
+  created_at: string
+  label: string
+  snapshot: string
+}

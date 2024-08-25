@@ -4,6 +4,8 @@ import { JWT } from "next-auth/jwt"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { IExtendedJWT, IExtendedSession } from "@/utils/interfaces"
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -30,7 +32,7 @@ export const authOptions: NextAuthOptions = {
       },
       authorize: async (credentials) => {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, {
+          const res = await fetch(`${API_URL}/auth/signin`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -73,7 +75,7 @@ export const authOptions: NextAuthOptions = {
 
       if (token.accessToken) {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+          const res = await fetch(`${API_URL}/auth/me`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token.accessToken}`,
