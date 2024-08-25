@@ -26,13 +26,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (status === "authenticated" && session) {
-      console.log("Session authenticated, setting WebSocket URL")
       const extendedSession = session as IExtendedSession
       if (extendedSession?.accessToken) {
         setSocketUrl(`${WS_URL}?token=${extendedSession.accessToken}`)
       }
     } else {
-      console.log("Session not authenticated or no session found, closing WebSocket if open")
       if (socketRef.current) {
         socketRef.current.close()
         socketRef.current = null
@@ -45,78 +43,80 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (socketUrl) {
-      console.log("Initializing WebSocket connection...")
-      socketRef.current = new WebSocket(socketUrl)
-
-      socketRef.current.onopen = () => {
-        console.log("WebSocket connection opened")
-      }
-
-      socketRef.current.onmessage = (event) => {
-        console.log("WebSocket message received...")
-        const msg = JSON.parse(event.data)
-
-        if (msg.type === "Patch") {
-          msg.ops.forEach((op: any) => {
-            switch (op.type) {
-              // User Operations
-              case "UserAdded":
-                setUsers((prevUsers) => [...prevUsers, op.user])
-                setSnackbarMessage("User added successfully!")
-                setSnackbarOpen(true)
-                break
-              case "UserNameUpdated":
-                setUsers((prevUsers) =>
-                  prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)),
-                )
-                setNotes((prevNotes) =>
-                  prevNotes.map((note) => (note.owner_id === op.id ? { ...note, name: op.name } : note)),
-                )
-                setSnackbarMessage("User name updated successfully!")
-                setSnackbarOpen(true)
-                break
-              case "UserColorUpdated":
-                setUsers((prevUsers) =>
-                  prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)),
-                )
-                setNotes((prevNotes) =>
-                  prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
-                )
-                setSnackbarMessage("User color updated successfully!")
-                setSnackbarOpen(true)
-                break
-              case "UserRemoved":
-                setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
-                setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
-                setSnackbarMessage("User removed successfully!")
-                setSnackbarOpen(true)
-                break
-              default:
-                console.error("Unknown operation", op)
-                break
-            }
-          })
-        } else if (msg.type === "Users") {
-          setUsers(msg.items)
-        } else if (msg.type === "Notes") {
-          setNotes(msg.items)
-        }
-      }
-
-      socketRef.current.onclose = (event) => {
-        console.log("WebSocket connection closed", event)
-      }
-
-      socketRef.current.onerror = (error) => {
-        console.error("WebSocket error", error)
-      }
-
-      return () => {
-        console.log("Cleaning up WebSocket connection")
-        socketRef.current?.close()
-      }
+      connectWebSocket()
     }
   }, [socketUrl])
+
+  const connectWebSocket = () => {
+    socketRef.current = new WebSocket(socketUrl!)
+
+    socketRef.current.onopen = () => {
+      console.log("WebSocket connection opened")
+    }
+
+    socketRef.current.onmessage = (event) => {
+      console.log("WebSocket message received...", event.data)
+      const msg = JSON.parse(event.data)
+
+      if (msg.type === "Patch") {
+        handlePatchMessage(msg)
+      } else if (msg.type === "Users") {
+        setUsers(msg.items)
+      } else if (msg.type === "Notes") {
+        setNotes(msg.items)
+      }
+    }
+
+    socketRef.current.onclose = (event) => {
+      console.log("WebSocket connection closed", event)
+
+      setTimeout(() => {
+        console.log(`Reconnecting WebSocket...`)
+        connectWebSocket() // Attempt to reconnect
+      }, 1000)
+    }
+
+    socketRef.current.onerror = (error) => {
+      console.error("WebSocket error", error)
+    }
+  }
+
+  const handlePatchMessage = (msg: any) => {
+    msg.ops.forEach((op: any) => {
+      switch (op.type) {
+        case "UserAdded":
+          setUsers((prevUsers) => [...prevUsers, op.user])
+          setSnackbarMessage("User added successfully!")
+          setSnackbarOpen(true)
+          break
+        case "UserNameUpdated":
+          setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)))
+          setNotes((prevNotes) =>
+            prevNotes.map((note) => (note.owner_id === op.id ? { ...note, name: op.name } : note)),
+          )
+          setSnackbarMessage("User name updated successfully!")
+          setSnackbarOpen(true)
+          break
+        case "UserColorUpdated":
+          setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)))
+          setNotes((prevNotes) =>
+            prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
+          )
+          setSnackbarMessage("User color updated successfully!")
+          setSnackbarOpen(true)
+          break
+        case "UserRemoved":
+          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
+          setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
+          setSnackbarMessage("User removed successfully!")
+          setSnackbarOpen(true)
+          break
+        default:
+          console.error("Unknown operation", op)
+          break
+      }
+    })
+  }
 
   function sendMessage(message: string) {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
