@@ -2,39 +2,17 @@
 import { useMemo } from "react"
 import { Alert, AlertTitle, Box, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
+import { fetchWithAuth } from "@/app/api/fetchWrapper"
 import { BackdropLoading } from "@/components/BackdropLoading"
 import { Board } from "@/components/Board"
 import { normalizeNotes } from "@/utils/helpers"
 import { IExtendedSession, IHistoryItem } from "@/utils/interfaces"
-import { removeStoredUserEmail } from "@/utils/storage"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 const fetchHistoryItem = async (id: string, accessToken?: string): Promise<IHistoryItem> => {
-  if (!accessToken) {
-    throw new Error("No access token available")
-  }
-
-  const response = await fetch(`${API_URL}/history/${id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-
-  if (response.status === 401) {
-    signOut()
-    removeStoredUserEmail()
-  } else if (response.status === 403) {
-    throw new Error("Forbidden: You do not have access to this resource.")
-  } else if (response.status === 404) {
-    throw new Error("Not Found: The requested resource could not be found.")
-  } else if (!response.ok) {
-    throw new Error("An unexpected error occurred. Please try again later.")
-  }
-
-  return response.json()
+  return fetchWithAuth<IHistoryItem>(`${API_URL}/history/${id}`, accessToken)
 }
 
 export function HistoryDetailScreen({ id }: { id: string }) {
