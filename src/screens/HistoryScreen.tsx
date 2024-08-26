@@ -60,7 +60,7 @@ export function HistoryScreen() {
     enabled: !!session?.accessToken,
   })
 
-  if (isLoading || !data) return <BackdropLoading isInDashboard={true} />
+  if (isLoading) return <BackdropLoading isInDashboard={true} />
 
   if (error instanceof Error) {
     return (
@@ -127,7 +127,7 @@ export function HistoryScreen() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map(({ id, created_at, label }, index) => (
+            {data?.map(({ id, created_at, label }, index) => (
               <TableRow
                 key={id}
                 sx={{

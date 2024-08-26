@@ -5,9 +5,10 @@ import { BoardColumn } from "./BoardColumn"
 
 interface Props {
   notes: INote[]
+  isEditable: boolean
 }
 
-export function Board({ notes }: Props) {
+export function Board({ notes, isEditable }: Props) {
   const columns = useMemo(
     () => [
       {
@@ -40,7 +41,7 @@ export function Board({ notes }: Props) {
         sx={{ overflowX: "auto" }}
       >
         {columns.map(({ title, items }) => (
-          <BoardColumn key={title} title={title} items={items} />
+          <BoardColumn key={title} title={title} items={items} isEditable={isEditable} />
         ))}
       </Stack>
     </Box>

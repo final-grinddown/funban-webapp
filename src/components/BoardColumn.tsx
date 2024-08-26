@@ -5,9 +5,10 @@ import { BoardItemCard } from "./BoardItemCard"
 interface Props {
   title: string
   items: INote[]
+  isEditable: boolean
 }
 
-export function BoardColumn({ title, items }: Props) {
+export function BoardColumn({ title, items, isEditable }: Props) {
   return (
     <Box bgcolor="background.paper" width="100%" minWidth={300}>
       <Box p={2} bgcolor="primary.main" sx={{ borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
@@ -15,7 +16,7 @@ export function BoardColumn({ title, items }: Props) {
       </Box>
       <List>
         {items.map((item) => (
-          <BoardItemCard key={item.id} {...item} />
+          <BoardItemCard key={item.id} {...item} isEditable={isEditable} />
         ))}
       </List>
     </Box>

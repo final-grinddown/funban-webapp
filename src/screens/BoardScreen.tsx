@@ -65,7 +65,7 @@ export function BoardScreen({ users, notes }: Props) {
         </ButtonGroup>
       </Box>
 
-      <Board notes={notes} />
+      <Board notes={notes} isEditable={true} />
     </>
   )
 }

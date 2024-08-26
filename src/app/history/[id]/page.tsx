@@ -2,6 +2,7 @@
 import { useSession } from "next-auth/react"
 import { BackdropLoading } from "@/components/BackdropLoading"
 import { DashboardLayout } from "@/components/DashboardLayout"
+import { HistoryDetailScreen } from "@/screens/HistoryDetailScreen"
 
 export default function HistoryItem({ params }: { params: { id: string } }) {
   const { data } = useSession()
@@ -12,7 +13,7 @@ export default function HistoryItem({ params }: { params: { id: string } }) {
 
   return (
     <DashboardLayout userEmail={data.user.email}>
-      <div>TODO: HISTORY ITEM {params.id}</div>
+      <HistoryDetailScreen id={params.id} />
     </DashboardLayout>
   )
 }

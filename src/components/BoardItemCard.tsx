@@ -8,10 +8,23 @@ import { INote } from "@/utils/interfaces"
 import { EditNoteModal } from "./EditNoteModal"
 
 interface Props extends INote {
+  isEditable: boolean
   avatarUrl?: string
 }
 
-export function BoardItemCard({ text, name, color, owner_id, state, index, updated, created, avatarUrl, id }: Props) {
+export function BoardItemCard({
+  text,
+  name,
+  color,
+  owner_id,
+  state,
+  index,
+  updated,
+  created,
+  avatarUrl,
+  id,
+  isEditable,
+}: Props) {
   const theme = useTheme()
   const matchedColor = matchColorName(color, availableColors) || "#000000"
   const avatarInitial = name.charAt(0).toUpperCase()
@@ -57,12 +70,14 @@ export function BoardItemCard({ text, name, color, owner_id, state, index, updat
             </Typography>
           }
           action={
-            <IconButton
-              sx={{ color: contrastColor, border: `2px solid ${alpha(contrastColor, 0.75)}` }}
-              onClick={handleOpenModal}
-            >
-              <EditNoteIcon />
-            </IconButton>
+            isEditable && (
+              <IconButton
+                sx={{ color: contrastColor, border: `2px solid ${alpha(contrastColor, 0.75)}` }}
+                onClick={handleOpenModal}
+              >
+                <EditNoteIcon />
+              </IconButton>
+            )
           }
           sx={{ bgcolor: alpha(matchedColor, 0.75) }}
         />

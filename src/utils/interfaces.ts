@@ -69,6 +69,20 @@ export interface INote {
   created: string
 }
 
+export interface IRawNote {
+  id: string
+  text: string
+  state: "notes" | "todo" | "in_progress" | "done"
+  index: number
+  owner: {
+    id: string
+    name: string
+    color: string
+  }
+  updated: string
+  created: string
+}
+
 export interface IUpdateNoteDetail {
   type: "UpdateNoteDetail"
   id: number
