@@ -102,3 +102,8 @@ export interface IHistoryItem {
   label: string
   snapshot: string
 }
+
+export interface ISnapshotData {
+  label: string
+  notes: IRawNote[]
+}

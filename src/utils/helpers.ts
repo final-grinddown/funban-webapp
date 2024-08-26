@@ -58,3 +58,22 @@ export function normalizeNotes(notes: IRawNote[]): INote[] {
     created: note.created,
   }))
 }
+
+/**
+ * Encodes a string into Base64 format while preserving Unicode characters.
+ *
+ * This function first encodes the input string as a URI component to handle any special
+ * or non-Latin1 characters. It then converts each percent-encoded character sequence back
+ * into a character before performing the Base64 encoding. This ensures that any Unicode
+ * characters in the input string are correctly preserved in the Base64 output.
+ *
+ * @param str - The string to be encoded in Base64 format.
+ * @returns The Base64 encoded string.
+ */
+export function base64EncodeUnicode(str: string): string {
+  return btoa(
+    encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => {
+      return String.fromCharCode(parseInt(p1, 16))
+    }),
+  )
+}
