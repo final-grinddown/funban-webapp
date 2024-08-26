@@ -34,18 +34,12 @@ export function EditNoteModal({ isOpen, note, onClose }: Props) {
   const {
     control,
     handleSubmit,
-    setValue,
+    reset,
     formState: { errors, isDirty },
   } = useForm<FormInputs>({
     defaultValues: { text: note.text, state: note.state },
+    mode: "onChange",
   })
-
-  useEffect(() => {
-    if (isOpen) {
-      setValue("text", note.text)
-      setValue("state", note.state)
-    }
-  }, [isOpen, note, setValue])
 
   const onSubmit = (data: FormInputs) => {
     const hasTextChanged = data.text !== note.text
@@ -55,16 +49,21 @@ export function EditNoteModal({ isOpen, note, onClose }: Props) {
       // Both text and state have changed
       const message = createUpdateNoteDetail(note.id.toString(), data.text, data.state)
       sendMessage(message)
-      console.log(message)
     } else if (hasTextChanged) {
       const message = createUpdateNoteText(note.id.toString(), data.text)
       sendMessage(message)
     } else if (hasStateChanged) {
-      console.log("TODO:Only state has changed, fix in future")
+      console.log("TODO: Only state has changed, fix in future")
     }
 
     onClose()
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      reset({ text: note.text, state: note.state })
+    }
+  }, [isOpen, note, reset])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth>

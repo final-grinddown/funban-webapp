@@ -19,8 +19,8 @@ export function NameEditModal({ isOpen, initialName, existingNames, onClose, onS
   const {
     control,
     handleSubmit,
-    setValue,
-    formState: { errors, isValid },
+    reset,
+    formState: { errors, isValid, isDirty },
   } = useForm<FormInputs>({
     defaultValues: { name: initialName },
     mode: "onChange",
@@ -33,9 +33,9 @@ export function NameEditModal({ isOpen, initialName, existingNames, onClose, onS
 
   useEffect(() => {
     if (isOpen) {
-      setValue("name", initialName)
+      reset({ name: initialName })
     }
-  }, [initialName, isOpen, setValue])
+  }, [initialName, isOpen, reset])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth={true}>
@@ -86,7 +86,7 @@ export function NameEditModal({ isOpen, initialName, existingNames, onClose, onS
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isValid}>
+        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isValid || !isDirty}>
           Save
         </Button>
       </DialogActions>

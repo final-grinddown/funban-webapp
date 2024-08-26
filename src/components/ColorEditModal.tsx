@@ -92,7 +92,12 @@ export function ColorEditModal({ isOpen, currentColor, availableColors, onClose,
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
+        <Button
+          onClick={handleSave}
+          color="primary"
+          variant="contained"
+          disabled={selectedColor === currentColor} // Disable if color is not changed
+        >
           Save
         </Button>
       </DialogActions>

@@ -1,5 +1,5 @@
 "use client"
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { Alert, Snackbar } from "@mui/material"
 import { useSession } from "next-auth/react"
 import { IExtendedSession, INote, IUser } from "@/utils/interfaces"
@@ -41,13 +41,56 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     }
   }, [session, status])
 
-  useEffect(() => {
-    if (socketUrl) {
-      connectWebSocket()
-    }
-  }, [socketUrl])
+  const handlePatchMessage = useCallback(
+    (msg: any) => {
+      msg.ops.forEach((op: any) => {
+        switch (op.type) {
+          case "UserAdded":
+            setUsers((prevUsers) => [...prevUsers, op.user])
+            setSnackbarMessage("User added successfully!")
+            setSnackbarOpen(true)
+            break
+          case "UserNameUpdated":
+            setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)))
+            setNotes((prevNotes) =>
+              prevNotes.map((note) => (note.owner_id === op.id ? { ...note, name: op.name } : note)),
+            )
+            setSnackbarMessage("User name updated successfully!")
+            setSnackbarOpen(true)
+            break
+          case "UserColorUpdated":
+            setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)))
+            setNotes((prevNotes) =>
+              prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
+            )
+            setSnackbarMessage("User color updated successfully!")
+            setSnackbarOpen(true)
+            break
+          case "UserRemoved":
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
+            setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
+            setSnackbarMessage("User removed successfully!")
+            setSnackbarOpen(true)
+            break
+          case "NoteTextUpdated":
+            setNotes((prevNotes) =>
+              prevNotes.map((note) =>
+                note.id === op.id ? { ...note, text: op.text, updated: new Date().toISOString() } : note,
+              ),
+            )
+            setSnackbarMessage("Note text updated successfully!")
+            setSnackbarOpen(true)
+            break
+          default:
+            console.error("Unknown operation", op)
+            break
+        }
+      })
+    },
+    [setUsers, setNotes, setSnackbarMessage, setSnackbarOpen],
+  )
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     socketRef.current = new WebSocket(socketUrl!)
 
     socketRef.current.onopen = () => {
@@ -79,53 +122,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     socketRef.current.onerror = (error) => {
       console.error("WebSocket error", error)
     }
-  }
-
-  const handlePatchMessage = (msg: any) => {
-    msg.ops.forEach((op: any) => {
-      switch (op.type) {
-        case "UserAdded":
-          setUsers((prevUsers) => [...prevUsers, op.user])
-          setSnackbarMessage("User added successfully!")
-          setSnackbarOpen(true)
-          break
-        case "UserNameUpdated":
-          setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)))
-          setNotes((prevNotes) =>
-            prevNotes.map((note) => (note.owner_id === op.id ? { ...note, name: op.name } : note)),
-          )
-          setSnackbarMessage("User name updated successfully!")
-          setSnackbarOpen(true)
-          break
-        case "UserColorUpdated":
-          setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)))
-          setNotes((prevNotes) =>
-            prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
-          )
-          setSnackbarMessage("User color updated successfully!")
-          setSnackbarOpen(true)
-          break
-        case "UserRemoved":
-          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
-          setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
-          setSnackbarMessage("User removed successfully!")
-          setSnackbarOpen(true)
-          break
-        case "NoteTextUpdated":
-          setNotes((prevNotes) =>
-            prevNotes.map((note) =>
-              note.id === op.id ? { ...note, text: op.text, updated: new Date().toISOString() } : note,
-            ),
-          )
-          setSnackbarMessage("Note text updated successfully!")
-          setSnackbarOpen(true)
-          break
-        default:
-          console.error("Unknown operation", op)
-          break
-      }
-    })
-  }
+  }, [socketUrl, handlePatchMessage])
 
   function sendMessage(message: string) {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -155,6 +152,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   function handleSnackbarClose() {
     setSnackbarOpen(false)
   }
+
+  useEffect(() => {
+    if (socketUrl) {
+      connectWebSocket()
+    }
+  }, [socketUrl, connectWebSocket])
 
   return (
     <WebSocketContext.Provider value={{ users, notes, sendMessage, connectionStatus: getConnectionStatus() }}>
