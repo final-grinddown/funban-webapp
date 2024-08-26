@@ -1,5 +1,4 @@
-import { signOut } from "next-auth/react"
-import { removeStoredUserEmail } from "@/utils/storage"
+import { clearApp } from "@/app/api/auth/clearApp"
 
 type FetchMethod = "GET" | "POST" | "PUT" | "DELETE"
 
@@ -27,8 +26,7 @@ export async function fetchWithAuth<T>(url: string, accessToken?: string, option
   })
 
   if (response.status === 401) {
-    signOut()
-    removeStoredUserEmail()
+    clearApp()
   } else if (response.status === 403) {
     throw new Error("Forbidden: You do not have access to this resource.")
   } else if (response.status === 404) {

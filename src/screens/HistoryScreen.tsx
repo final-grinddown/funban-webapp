@@ -13,23 +13,18 @@ import {
   Typography,
   useTheme,
 } from "@mui/material"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { fetchWithAuth } from "@/app/api/fetchWrapper"
+import { fetchHistory, fetchHistoryItem } from "@/app/api/fetches"
 import { BackdropLoading } from "@/components/BackdropLoading"
 import { ERoutes } from "@/utils/enums"
-import { IExtendedSession, IHistoryItem } from "@/utils/interfaces"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-
-const fetchHistory = async (accessToken?: string): Promise<IHistoryItem[]> => {
-  return fetchWithAuth<IHistoryItem[]>(`${API_URL}/history`, accessToken)
-}
+import { IExtendedSession } from "@/utils/interfaces"
 
 export function HistoryScreen() {
   const theme = useTheme()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { data: session } = useSession() as { data: IExtendedSession }
 
   const { data, isLoading, error } = useQuery({
@@ -37,6 +32,13 @@ export function HistoryScreen() {
     queryFn: () => fetchHistory(session?.accessToken),
     enabled: !!session?.accessToken,
   })
+
+  const handleMouseEnter = (id: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ["historyItem", id],
+      queryFn: () => fetchHistoryItem(id, session?.accessToken),
+    })
+  }
 
   if (isLoading) return <BackdropLoading isInDashboard={true} />
 
@@ -118,6 +120,7 @@ export function HistoryScreen() {
                     border: 0,
                   },
                 }}
+                onMouseEnter={() => handleMouseEnter(id.toString())} // Prefetch on hover
                 onClick={() => router.push(`${ERoutes.History}/${id}`)}
               >
                 <TableCell>{id}</TableCell>

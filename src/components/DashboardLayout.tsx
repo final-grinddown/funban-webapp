@@ -20,9 +20,8 @@ import {
   useTheme,
 } from "@mui/material"
 import Link from "next/link"
-import { signOut } from "next-auth/react"
+import { clearApp } from "@/app/api/auth/clearApp"
 import { ERoutes } from "@/utils/enums"
-import { removeStoredUserEmail } from "@/utils/storage"
 
 interface Props {
   children: ReactNode
@@ -44,8 +43,7 @@ export function DashboardLayout({ children, userEmail }: Props) {
   }
 
   const handleLogout = () => {
-    signOut()
-    removeStoredUserEmail()
+    clearApp()
   }
 
   return (

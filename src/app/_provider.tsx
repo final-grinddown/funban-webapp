@@ -3,8 +3,9 @@ import { ReactNode, useEffect, useState } from "react"
 import { CssBaseline, ThemeProvider } from "@mui/material"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter"
 import { Theme } from "@mui/system"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { client } from "@/app/api/client"
 import { darkTheme, lightTheme } from "@/styles/theme"
 import { useThemeStore } from "@/utils/store"
 import { TThemeMode } from "@/utils/types"
@@ -21,7 +22,6 @@ const themeMap: Record<Exclude<TThemeMode, "system">, Theme> = {
 const getSystemTheme = () => (window.matchMedia("(prefers-color-scheme: dark)").matches ? darkTheme : lightTheme)
 
 export default function Provider({ children }: Props) {
-  const queryClient = new QueryClient()
   const { mode, initializeTheme } = useThemeStore()
   const [isMounted, setIsMounted] = useState(false)
   const theme = mode === "system" ? getSystemTheme() : themeMap[mode]
@@ -36,7 +36,7 @@ export default function Provider({ children }: Props) {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
