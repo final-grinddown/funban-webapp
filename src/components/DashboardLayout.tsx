@@ -67,7 +67,7 @@ export function DashboardLayout({ children, userEmail }: Props) {
             edge="start"
             color="inherit"
             aria-label="menu"
-            sx={{ display: { lg: "none" }, zIndex: 1, mr: 2 }}
+            sx={{ display: { lg: "none" }, zIndex: 1 }}
             onClick={toggleDrawer(true)}
           >
             <MenuIcon />
