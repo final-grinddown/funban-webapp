@@ -20,7 +20,9 @@ import { INote } from "@/utils/interfaces"
 
 interface Props {
   isOpen: boolean
-  note: INote
+  noteId: INote["id"]
+  noteState: INote["state"]
+  noteText: INote["text"]
   onClose: () => void
 }
 
@@ -29,7 +31,7 @@ interface FormInputs {
   state: string
 }
 
-export function EditNoteModal({ isOpen, note, onClose }: Props) {
+export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: Props) {
   const { sendMessage } = useWebSocketContext()
   const {
     control,
@@ -37,20 +39,20 @@ export function EditNoteModal({ isOpen, note, onClose }: Props) {
     reset,
     formState: { errors, isDirty },
   } = useForm<FormInputs>({
-    defaultValues: { text: note.text, state: note.state },
+    defaultValues: { text: noteText, state: noteState },
     mode: "onChange",
   })
 
   const onSubmit = (data: FormInputs) => {
-    const hasTextChanged = data.text !== note.text
-    const hasStateChanged = data.state !== note.state
+    const hasTextChanged = data.text !== noteText
+    const hasStateChanged = data.state !== noteState
 
     if (hasTextChanged && hasStateChanged) {
       // Both text and state have changed
-      const message = createUpdateNoteDetail(note.id.toString(), data.text, data.state)
+      const message = createUpdateNoteDetail(noteId.toString(), data.text, data.state)
       sendMessage(message)
     } else if (hasTextChanged) {
-      const message = createUpdateNoteText(note.id.toString(), data.text)
+      const message = createUpdateNoteText(noteId.toString(), data.text)
       sendMessage(message)
     } else if (hasStateChanged) {
       console.log("TODO: Only state has changed, fix in future")
@@ -61,9 +63,9 @@ export function EditNoteModal({ isOpen, note, onClose }: Props) {
 
   useEffect(() => {
     if (isOpen) {
-      reset({ text: note.text, state: note.state })
+      reset({ text: noteText, state: noteState })
     }
-  }, [isOpen, note, reset])
+  }, [isOpen, noteState, noteText, reset])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth>
@@ -110,7 +112,7 @@ export function EditNoteModal({ isOpen, note, onClose }: Props) {
           />
         </form>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ px: 3 }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>

@@ -96,6 +96,11 @@ export interface IUpdateNoteText {
   text: string
 }
 
+export interface IRemoveNote {
+  type: "RemoveNote"
+  id: number
+}
+
 export interface IHistoryItem {
   id: number
   created_at: string

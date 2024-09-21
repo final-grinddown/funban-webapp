@@ -1,5 +1,6 @@
 import {
   IAddUser,
+  IRemoveNote,
   IRemoveUser,
   IUpdateNoteDetail,
   IUpdateNoteText,
@@ -63,5 +64,15 @@ export function createUpdateNoteText(id: string, text: string): string {
     id: parseInt(id),
     text,
   }
+
+  return JSON.stringify(action)
+}
+
+export function createDeleteNote(id: string): string {
+  const action: IRemoveNote = {
+    type: "RemoveNote",
+    id: parseInt(id),
+  }
+
   return JSON.stringify(action)
 }
