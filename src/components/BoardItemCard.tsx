@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Divider,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -114,11 +115,12 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
                     </ListItemIcon>
                     <ListItemText>Edit note</ListItemText>
                   </MenuItem>
+                  <Divider />
                   <MenuItem onClick={handleDeleteOpenModal}>
                     <ListItemIcon>
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon fontSize="small" color="error" />
                     </ListItemIcon>
-                    <ListItemText>Delete note</ListItemText>
+                    <ListItemText sx={{ color: theme.palette.error.main }}>Delete note</ListItemText>
                   </MenuItem>
                 </Menu>
               </>
