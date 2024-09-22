@@ -23,6 +23,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const socketRef = useRef<WebSocket | null>(null)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState<string>("")
+  const lastUUIDRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -65,13 +66,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
               prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
             )
             setSnackbarMessage("User color updated successfully!")
-
             break
           case "UserRemoved":
             setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
             setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
             setSnackbarMessage("User removed successfully!")
-
             break
           case "NoteTextUpdated":
             textUpdated = true
@@ -90,12 +89,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           case "NoteRemoved":
             setNotes((prevNotes) => prevNotes.filter((note) => note.id !== op.id))
             setSnackbarMessage("Note removed successfully!")
-
             break
           case "NoteAdded":
             setNotes((prevNotes) => [...prevNotes, op.note])
             setSnackbarMessage("Note added successfully!")
-
+            break
+          case "ActionFinished":
+            if (op.uuid === lastUUIDRef.current) {
+              setSnackbarOpen(true)
+            }
             break
           default:
             console.error("Unknown operation", op)
@@ -110,8 +112,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       } else if (orderUpdated) {
         setSnackbarMessage("Note status changed successfully!")
       }
-
-      setSnackbarOpen(true)
     },
 
     [setUsers, setNotes, setSnackbarMessage, setSnackbarOpen],
@@ -152,10 +152,26 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, [socketUrl, handlePatchMessage])
 
   function sendMessage(message: string) {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(message)
-    } else {
-      console.error("WebSocket is not open. Unable to send message.")
+    const uuid = crypto.randomUUID()
+
+    try {
+      const parsedMessage = JSON.parse(message)
+
+      if (typeof parsedMessage === "object" && parsedMessage !== null) {
+        parsedMessage.uuid = uuid
+      }
+
+      const messageWithUUID = JSON.stringify(parsedMessage)
+
+      lastUUIDRef.current = uuid
+
+      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+        socketRef.current.send(messageWithUUID)
+      } else {
+        console.error("WebSocket is not open. Unable to send message.")
+      }
+    } catch (error) {
+      console.error("Failed to parse the message or append UUID:", error)
     }
   }
 
