@@ -1,4 +1,5 @@
 import {
+  IAddNote,
   IAddUser,
   ICloneNote,
   IRemoveNote,
@@ -44,6 +45,17 @@ export function createDeleteUser(id: number): string {
   const action: IRemoveUser = {
     type: "RemoveUser",
     id: id,
+  }
+
+  return JSON.stringify(action)
+}
+
+export function createNewNote(owner: string, text: string, state: string): string {
+  const action: IAddNote = {
+    type: "AddNote",
+    owner: parseInt(owner),
+    state,
+    text,
   }
 
   return JSON.stringify(action)

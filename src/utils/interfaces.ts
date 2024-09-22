@@ -83,6 +83,13 @@ export interface IRawNote {
   created: string
 }
 
+export interface IAddNote {
+  type: "AddNote"
+  owner: number
+  state: string
+  text: string
+}
+
 export interface IUpdateNote {
   type: "NoteUpdate"
   id: number

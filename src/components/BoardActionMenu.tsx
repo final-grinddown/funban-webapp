@@ -1,17 +1,25 @@
 import AddIcon from "@mui/icons-material/Add"
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak"
 import CheckIcon from "@mui/icons-material/Check"
-import { Divider, ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material"
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material"
 
 interface BoardActionsMenuProps {
   anchorEl: HTMLElement | null
   openMenu: boolean
   onClose: () => void
   onStartFocus: () => void
-  onOpenModal: () => void
+  onOpenAddNewNoteModal: () => void
+  onOpenEndStatusModal: () => void
 }
 
-export function BoardActionsMenu({ anchorEl, openMenu, onClose, onStartFocus, onOpenModal }: BoardActionsMenuProps) {
+export function BoardActionsMenu({
+  anchorEl,
+  openMenu,
+  onClose,
+  onStartFocus,
+  onOpenAddNewNoteModal,
+  onOpenEndStatusModal,
+}: BoardActionsMenuProps) {
   return (
     <Menu
       anchorEl={anchorEl}
@@ -21,7 +29,7 @@ export function BoardActionsMenu({ anchorEl, openMenu, onClose, onStartFocus, on
         "aria-labelledby": "open board actions menu",
       }}
     >
-      <MenuItem onClick={() => console.log("create a new note")}>
+      <MenuItem onClick={onOpenAddNewNoteModal}>
         <ListItemIcon>
           <AddIcon fontSize="small" />
         </ListItemIcon>
@@ -33,8 +41,7 @@ export function BoardActionsMenu({ anchorEl, openMenu, onClose, onStartFocus, on
         </ListItemIcon>
         <ListItemText>Start focus</ListItemText>
       </MenuItem>
-      <Divider />
-      <MenuItem onClick={onOpenModal}>
+      <MenuItem onClick={onOpenEndStatusModal}>
         <ListItemIcon>
           <CheckIcon fontSize="small" />
         </ListItemIcon>

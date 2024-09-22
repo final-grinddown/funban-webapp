@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import SettingsIcon from "@mui/icons-material/Settings"
 import { Box, Button, ButtonGroup, Typography } from "@mui/material"
+import { AddNewNoteModal } from "@/components/AddNewNoteModal"
 import { Board } from "@/components/Board"
 import { BoardActionsMenu } from "@/components/BoardActionMenu"
 import { EndStatusModal } from "@/components/EndStatusModal"
@@ -20,8 +21,18 @@ interface Props {
 export function BoardScreen({ users, notes, accessToken }: Props) {
   const { user, handleChange, handlePrevUser, handleNextUser } = useUserSelection(users)
   const { isFocus, shouldRenderFocus, handleStartFocus, handleEndFocus } = useFocusManagement(users)
-  const { isModalOpen, anchorEl, openMenu, handleOpenModal, handleCloseModal, handleOpenMenu, handleCloseMenu } =
-    useBoardModalManagement()
+  const {
+    isEndStatusModalOpen,
+    isAddNewNoteModalOpen,
+    anchorEl,
+    openMenu,
+    handleCloseEndStatusModal,
+    handleOpenAddNewNoteModal,
+    handleOpenEndStatusModal,
+    handleCloseAddNewNoteModal,
+    handleOpenMenu,
+    handleCloseMenu,
+  } = useBoardModalManagement()
 
   const snapshot = useMemo(
     () =>
@@ -62,7 +73,8 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
           openMenu={openMenu}
           onClose={handleCloseMenu}
           onStartFocus={handleStartFocus}
-          onOpenModal={handleOpenModal}
+          onOpenEndStatusModal={handleOpenEndStatusModal}
+          onOpenAddNewNoteModal={handleOpenAddNewNoteModal}
         />
         <ButtonGroup
           variant="contained"
@@ -70,11 +82,11 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
           sx={{ maxWidth: { md: 600 }, display: { xs: "none", md: "flex" } }}
           fullWidth
         >
-          <Button>Create a new note</Button>
+          <Button onClick={handleOpenAddNewNoteModal}>Create a new note</Button>
           <Button color="success" onClick={handleStartFocus} disabled={isFocus}>
             Start focus
           </Button>
-          <Button color="error" onClick={handleOpenModal}>
+          <Button color="error" onClick={handleOpenEndStatusModal}>
             End status
           </Button>
         </ButtonGroup>
@@ -82,7 +94,14 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
 
       <Board notes={notes} isEditable />
 
-      <EndStatusModal isOpen={isModalOpen} notes={snapshot} onClose={handleCloseModal} accessToken={accessToken} />
+      <AddNewNoteModal isOpen={isAddNewNoteModalOpen} onClose={handleCloseAddNewNoteModal} users={users} />
+
+      <EndStatusModal
+        isOpen={isEndStatusModalOpen}
+        notes={snapshot}
+        onClose={handleCloseEndStatusModal}
+        accessToken={accessToken}
+      />
 
       {shouldRenderFocus && (
         <FocusControls

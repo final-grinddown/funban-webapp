@@ -1,21 +1,27 @@
 import { SyntheticEvent, useState } from "react"
 
 export function useBoardModalManagement() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAddNewNoteModalOpen, setIsAddNewNoteModalOpen] = useState(false)
+  const [isEndStatusModalOpen, setIsEndStatusModalOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const handleOpenModal = () => setIsModalOpen(true)
-  const handleCloseModal = () => setIsModalOpen(false)
+  const handleOpenAddNewNoteModal = () => setIsAddNewNoteModalOpen(true)
+  const handleCloseAddNewNoteModal = () => setIsAddNewNoteModalOpen(false)
+  const handleOpenEndStatusModal = () => setIsEndStatusModalOpen(true)
+  const handleCloseEndStatusModal = () => setIsEndStatusModalOpen(false)
 
   const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
   const handleCloseMenu = () => setAnchorEl(null)
 
   return {
-    isModalOpen,
+    isEndStatusModalOpen,
+    isAddNewNoteModalOpen,
     anchorEl,
     openMenu: Boolean(anchorEl),
-    handleOpenModal,
-    handleCloseModal,
+    handleOpenAddNewNoteModal,
+    handleCloseAddNewNoteModal,
+    handleOpenEndStatusModal,
+    handleCloseEndStatusModal,
     handleOpenMenu,
     handleCloseMenu,
   }
