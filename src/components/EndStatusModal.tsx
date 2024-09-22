@@ -124,7 +124,7 @@ export function EndStatusModal({ notes, accessToken, isOpen, onClose }: Props) {
       </Dialog>
 
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: "100%" }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} variant="filled" sx={{ width: "100%" }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
