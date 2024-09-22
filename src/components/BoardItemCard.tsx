@@ -22,6 +22,7 @@ import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { matchColorName } from "@/utils/helpers"
 import { INote } from "@/utils/interfaces"
+import { useFocusStateStore } from "@/utils/store"
 import { DeleteNoteModal } from "./DeleteNoteModal"
 import { EditNoteModal } from "./EditNoteModal"
 
@@ -32,6 +33,7 @@ interface Props extends INote {
 
 export function BoardItemCard({ text, name, color, state, updated, created, avatarUrl, id, isEditable }: Props) {
   const { sendMessage } = useWebSocketContext()
+  const { isFocus, currentUser } = useFocusStateStore()
   const theme = useTheme()
   const matchedColor = matchColorName(color, availableColors) || "#000000"
   const avatarInitial = name.charAt(0).toUpperCase()
@@ -78,7 +80,14 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
 
   return (
     <>
-      <Card elevation={4} sx={{ m: 2 }}>
+      <Card
+        elevation={4}
+        sx={{
+          m: 2,
+          opacity: isFocus && name !== currentUser ? 0.1 : 1,
+          transition: "opacity 0.3s",
+        }}
+      >
         <CardHeader
           avatar={<Avatar src={avatarUrl}>{!avatarUrl && avatarInitial}</Avatar>}
           title={
@@ -100,7 +109,8 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
             </Typography>
           }
           action={
-            isEditable && (
+            isEditable &&
+            (!isFocus || (isFocus && name === currentUser)) && (
               <>
                 <IconButton
                   sx={{ color: contrastColor, border: `2px solid ${alpha(contrastColor, 0.75)}` }}

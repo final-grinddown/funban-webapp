@@ -31,3 +31,17 @@ export const useThemeStore = create<IThemeState>((set) => ({
     )
   },
 }))
+
+interface IFocusState {
+  isFocus: boolean
+  currentUser: string
+  setIsFocus: (focus: boolean) => void
+  setCurrentUser: (user: string) => void
+}
+
+export const useFocusStateStore = create<IFocusState>((set) => ({
+  isFocus: false,
+  currentUser: "",
+  setIsFocus: (focus) => set({ isFocus: focus }),
+  setCurrentUser: (user) => set({ currentUser: user }),
+}))
