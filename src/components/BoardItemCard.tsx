@@ -84,8 +84,8 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
         elevation={4}
         sx={{
           m: 2,
-          opacity: isFocus && name !== currentUser ? 0.1 : 1,
-          transition: "opacity 0.3s",
+          opacity: isFocus && name !== currentUser ? 0.05 : 1,
+          transition: "opacity 0.25s ease-out",
         }}
       >
         <CardHeader

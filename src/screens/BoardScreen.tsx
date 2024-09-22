@@ -59,7 +59,7 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         gap={2}
         justifyContent="space-between"
       >
-        <UserSelector users={users} selectedUser={user} onChange={handleChange} />
+        <UserSelector users={users} selectedUser={user} onChange={handleChange} isDisabled={isFocus} />
         <Button
           variant="contained"
           sx={{ display: { md: "none" } }}
