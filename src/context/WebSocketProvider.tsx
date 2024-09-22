@@ -108,7 +108,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       } else if (textUpdated) {
         setSnackbarMessage("Note text updated successfully!")
       } else if (orderUpdated) {
-        setSnackbarMessage("Note order changed successfully!")
+        setSnackbarMessage("Note status changed successfully!")
       }
 
       setSnackbarOpen(true)
