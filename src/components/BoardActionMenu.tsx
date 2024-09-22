@@ -29,19 +29,34 @@ export function BoardActionsMenu({
         "aria-labelledby": "open board actions menu",
       }}
     >
-      <MenuItem onClick={onOpenAddNewNoteModal}>
+      <MenuItem
+        onClick={() => {
+          onOpenAddNewNoteModal()
+          onClose()
+        }}
+      >
         <ListItemIcon>
           <AddIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Create a new note</ListItemText>
       </MenuItem>
-      <MenuItem onClick={onStartFocus}>
+      <MenuItem
+        onClick={() => {
+          onStartFocus()
+          onClose()
+        }}
+      >
         <ListItemIcon>
           <CenterFocusWeakIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Start focus</ListItemText>
       </MenuItem>
-      <MenuItem onClick={onOpenEndStatusModal}>
+      <MenuItem
+        onClick={() => {
+          onOpenEndStatusModal()
+          onClose()
+        }}
+      >
         <ListItemIcon>
           <CheckIcon fontSize="small" />
         </ListItemIcon>

@@ -32,7 +32,7 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
     handleCloseAddNewNoteModal,
     handleOpenMenu,
     handleCloseMenu,
-  } = useBoardModalManagement()
+  } = useBoardModalManagement(isFocus, handleEndFocus)
 
   const snapshot = useMemo(
     () =>
