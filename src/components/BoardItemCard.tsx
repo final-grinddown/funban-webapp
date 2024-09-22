@@ -2,6 +2,7 @@ import { SyntheticEvent, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import EditNoteIcon from "@mui/icons-material/EditNote"
+import FileCopyIcon from "@mui/icons-material/FileCopy"
 import {
   Avatar,
   Card,
@@ -16,6 +17,8 @@ import {
   Typography,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
+import { createCloneNote } from "@/app/api/websocket"
+import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { matchColorName } from "@/utils/helpers"
 import { INote } from "@/utils/interfaces"
@@ -28,6 +31,7 @@ interface Props extends INote {
 }
 
 export function BoardItemCard({ text, name, color, state, updated, created, avatarUrl, id, isEditable }: Props) {
+  const { sendMessage } = useWebSocketContext()
   const theme = useTheme()
   const matchedColor = matchColorName(color, availableColors) || "#000000"
   const avatarInitial = name.charAt(0).toUpperCase()
@@ -64,6 +68,12 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
 
   const handleDeleteCloseModal = () => {
     setIsDeleteModalOpen(false)
+  }
+
+  const handleCloneNote = () => {
+    const message = createCloneNote(id.toString())
+    sendMessage(message)
+    handleCloseMenu()
   }
 
   return (
@@ -115,6 +125,12 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
                     </ListItemIcon>
                     <ListItemText>Edit note</ListItemText>
                   </MenuItem>
+                  <MenuItem onClick={handleCloneNote}>
+                    <ListItemIcon>
+                      <FileCopyIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Clone note</ListItemText>
+                  </MenuItem>
                   <Divider />
                   <MenuItem onClick={handleDeleteOpenModal}>
                     <ListItemIcon>
@@ -135,15 +151,19 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
         </CardContent>
       </Card>
 
-      <EditNoteModal
-        isOpen={isEditModalOpen}
-        noteId={id}
-        noteState={state}
-        noteText={text}
-        onClose={handleEditCloseModal}
-      />
+      {isEditable && (
+        <>
+          <EditNoteModal
+            isOpen={isEditModalOpen}
+            noteId={id}
+            noteState={state}
+            noteText={text}
+            onClose={handleEditCloseModal}
+          />
 
-      <DeleteNoteModal isOpen={isDeleteModalOpen} noteId={id} onClose={handleDeleteCloseModal} />
+          <DeleteNoteModal isOpen={isDeleteModalOpen} noteId={id} onClose={handleDeleteCloseModal} />
+        </>
+      )}
     </>
   )
 }

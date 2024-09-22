@@ -86,6 +86,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             setSnackbarMessage("Note removed successfully!")
             setSnackbarOpen(true)
             break
+          case "NoteAdded":
+            setNotes((prevNotes) => [...prevNotes, op.note])
+            setSnackbarMessage("Note added successfully!")
+            setSnackbarOpen(true)
+            break
           default:
             console.error("Unknown operation", op)
             break

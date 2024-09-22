@@ -101,6 +101,11 @@ export interface IRemoveNote {
   id: number
 }
 
+export interface ICloneNote {
+  type: "CloneNote"
+  id: number
+}
+
 export interface IHistoryItem {
   id: number
   created_at: string
