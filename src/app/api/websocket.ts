@@ -3,8 +3,9 @@ import {
   ICloneNote,
   IRemoveNote,
   IRemoveUser,
-  IUpdateNoteDetail,
+  IUpdateNote,
   IUpdateNoteText,
+  IUpdateReorderNote,
   IUpdateUserColor,
   IUpdateUserName,
 } from "@/utils/interfaces"
@@ -48,12 +49,20 @@ export function createDeleteUser(id: number): string {
   return JSON.stringify(action)
 }
 
-export function createUpdateNoteDetail(id: string, text: string, destinationStatus: string): string {
-  const action: IUpdateNoteDetail = {
-    type: "UpdateNoteDetail",
+export function createUpdateNote(id: string, text: string, destinationStatus: string): string {
+  const action: IUpdateNote = {
+    type: "NoteUpdate",
     id: parseInt(id),
-    text,
-    destination_status: destinationStatus,
+    updates: [
+      {
+        target: "Text",
+        text: text,
+      },
+      {
+        target: "Order",
+        new_status: destinationStatus,
+      },
+    ],
   }
 
   return JSON.stringify(action)
@@ -64,6 +73,16 @@ export function createUpdateNoteText(id: string, text: string): string {
     type: "UpdateNoteText",
     id: parseInt(id),
     text,
+  }
+
+  return JSON.stringify(action)
+}
+
+export function createUpdateNoteReorder(id: string, destinationStatus: string): string {
+  const action: IUpdateReorderNote = {
+    type: "Reorder",
+    moved_item_id: parseInt(id),
+    destination_status: destinationStatus,
   }
 
   return JSON.stringify(action)

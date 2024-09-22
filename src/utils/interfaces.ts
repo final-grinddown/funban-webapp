@@ -83,11 +83,16 @@ export interface IRawNote {
   created: string
 }
 
-export interface IUpdateNoteDetail {
-  type: "UpdateNoteDetail"
+export interface IUpdateNote {
+  type: "NoteUpdate"
   id: number
-  text: string
-  destination_status: string
+  updates: NoteUpdate[]
+}
+
+export interface NoteUpdate {
+  target: "Text" | "Order"
+  text?: string
+  new_status?: string
 }
 
 export interface IUpdateNoteText {
@@ -104,6 +109,12 @@ export interface IRemoveNote {
 export interface ICloneNote {
   type: "CloneNote"
   id: number
+}
+
+export interface IUpdateReorderNote {
+  type: "Reorder"
+  moved_item_id: number
+  destination_status: string
 }
 
 export interface IHistoryItem {

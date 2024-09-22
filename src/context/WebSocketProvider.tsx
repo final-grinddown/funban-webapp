@@ -43,12 +43,14 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const handlePatchMessage = useCallback(
     (msg: any) => {
+      let textUpdated = false
+      let orderUpdated = false
+
       msg.ops.forEach((op: any) => {
         switch (op.type) {
           case "UserAdded":
             setUsers((prevUsers) => [...prevUsers, op.user])
             setSnackbarMessage("User added successfully!")
-            setSnackbarOpen(true)
             break
           case "UserNameUpdated":
             setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, name: op.name } : user)))
@@ -56,7 +58,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
               prevNotes.map((note) => (note.owner_id === op.id ? { ...note, name: op.name } : note)),
             )
             setSnackbarMessage("User name updated successfully!")
-            setSnackbarOpen(true)
             break
           case "UserColorUpdated":
             setUsers((prevUsers) => prevUsers.map((user) => (user.id === op.id ? { ...user, color: op.color } : user)))
@@ -64,39 +65,55 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
               prevNotes.map((note) => (note.owner_id === op.id ? { ...note, color: op.color } : note)),
             )
             setSnackbarMessage("User color updated successfully!")
-            setSnackbarOpen(true)
+
             break
           case "UserRemoved":
             setUsers((prevUsers) => prevUsers.filter((user) => user.id !== op.id))
             setNotes((prevNotes) => prevNotes.filter((note) => note.owner_id !== op.id))
             setSnackbarMessage("User removed successfully!")
-            setSnackbarOpen(true)
+
             break
           case "NoteTextUpdated":
+            textUpdated = true
             setNotes((prevNotes) =>
               prevNotes.map((note) =>
                 note.id === op.id ? { ...note, text: op.text, updated: new Date().toISOString() } : note,
               ),
             )
-            setSnackbarMessage("Note text updated successfully!")
-            setSnackbarOpen(true)
+            break
+          case "NoteOrderChanged":
+            orderUpdated = true
+            setNotes((prevNotes) =>
+              prevNotes.map((note) => (note.id === op.id ? { ...note, state: op.state, index: op.index } : note)),
+            )
             break
           case "NoteRemoved":
             setNotes((prevNotes) => prevNotes.filter((note) => note.id !== op.id))
             setSnackbarMessage("Note removed successfully!")
-            setSnackbarOpen(true)
+
             break
           case "NoteAdded":
             setNotes((prevNotes) => [...prevNotes, op.note])
             setSnackbarMessage("Note added successfully!")
-            setSnackbarOpen(true)
+
             break
           default:
             console.error("Unknown operation", op)
             break
         }
       })
+
+      if (textUpdated && orderUpdated) {
+        setSnackbarMessage("Note text and status changed successfully!")
+      } else if (textUpdated) {
+        setSnackbarMessage("Note text updated successfully!")
+      } else if (orderUpdated) {
+        setSnackbarMessage("Note order changed successfully!")
+      }
+
+      setSnackbarOpen(true)
     },
+
     [setUsers, setNotes, setSnackbarMessage, setSnackbarOpen],
   )
 
