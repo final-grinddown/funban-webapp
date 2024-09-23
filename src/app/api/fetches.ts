@@ -9,7 +9,11 @@ export const fetchHistory = async (accessToken?: string): Promise<IHistoryItem[]
 }
 
 export const fetchHistoryItem = async (id: string, accessToken?: string): Promise<IHistoryItem> => {
-  return fetchWithAuth<IHistoryItem>(`${API_URL}/history/${id}`, accessToken)
+  return fetchWithAuth<IHistoryItem>(`${API_URL}/history/browser/${id}`, accessToken)
+}
+
+export const fetchHistoryItemLast = async (accessToken?: string): Promise<IHistoryItem> => {
+  return fetchWithAuth<IHistoryItem>(`${API_URL}/history/browser`, accessToken)
 }
 
 export const postSnapshot = async (data: ISnapshotData, accessToken?: string): Promise<void> => {

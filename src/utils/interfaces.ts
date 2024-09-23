@@ -129,6 +129,14 @@ export interface IHistoryItem {
   created_at: string
   label: string
   snapshot: string
+  previous: {
+    id: number
+    label: string
+  }
+  next: {
+    id: number
+    label: string
+  }
 }
 
 export interface ISnapshotData {

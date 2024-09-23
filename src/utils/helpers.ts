@@ -77,3 +77,20 @@ export function base64EncodeUnicode(str: string): string {
     }),
   )
 }
+
+/**
+ * Decodes a Base64 string that was encoded with Unicode characters preserved.
+ *
+ * This function decodes the Base64 string back into a binary string, then
+ * converts it into the original string format, correctly handling any Unicode
+ * characters in the string.
+ *
+ * @param base64Str - The Base64 encoded string to be decoded.
+ * @returns The original string with Unicode characters preserved.
+ */
+export function base64DecodeUnicode(base64Str: string): string {
+  const binaryStr = atob(base64Str)
+  const decodedStr = Array.from(binaryStr, (char) => String.fromCharCode(char.charCodeAt(0)))
+
+  return decodeURIComponent(decodedStr.join(""))
+}
