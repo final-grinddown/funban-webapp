@@ -1,14 +1,24 @@
 import CloseIcon from "@mui/icons-material/Close"
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from "@mui/material"
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material"
 
 interface Props {
   isOpen: boolean
   userName: string
   onClose: () => void
   onConfirm: () => void
+  isSubmitting: boolean
 }
 
-export function DeleteConfirmationModal({ isOpen, userName, onClose, onConfirm }: Props) {
+export function DeleteConfirmationModal({ isOpen, userName, onClose, onConfirm, isSubmitting }: Props) {
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth={true}>
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -32,12 +42,12 @@ export function DeleteConfirmationModal({ isOpen, userName, onClose, onConfirm }
           This operation will permanently remove the user and delete all related board items.
         </Typography>
       </DialogContent>
-      <DialogActions sx={{ px: 3 }}>
+      <DialogActions sx={{ px: 3, alignItems: "stretch" }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={onConfirm} color="error" variant="contained">
-          Delete
+        <Button onClick={onConfirm} color="error" variant="contained" disabled={isSubmitting} sx={{ width: "90px" }}>
+          {isSubmitting ? <CircularProgress size={20} /> : "Delete"}
         </Button>
       </DialogActions>
     </Dialog>

@@ -3,6 +3,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,6 +22,7 @@ interface Props {
   existingNames: string[]
   onClose: () => void
   onSave: (name: string, color: string) => void
+  isSubmitting: boolean
 }
 
 interface FormInputs {
@@ -28,7 +30,7 @@ interface FormInputs {
   color: string
 }
 
-export function AddNewTeamMemberModal({ isOpen, existingNames, onClose, onSave }: Props) {
+export function AddNewTeamMemberModal({ isOpen, existingNames, onClose, onSave, isSubmitting }: Props) {
   const {
     control,
     handleSubmit,
@@ -47,7 +49,6 @@ export function AddNewTeamMemberModal({ isOpen, existingNames, onClose, onSave }
 
   const onSubmit = (data: FormInputs) => {
     onSave(data.name, data.color)
-    onClose()
   }
 
   useEffect(() => {
@@ -141,12 +142,18 @@ export function AddNewTeamMemberModal({ isOpen, existingNames, onClose, onSave }
           />
         </form>
       </DialogContent>
-      <DialogActions sx={{ px: 3 }}>
+      <DialogActions sx={{ px: 3, alignItems: "stretch" }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isValid}>
-          Add
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          color="primary"
+          variant="contained"
+          disabled={isSubmitting || !isValid}
+          sx={{ width: "72px" }}
+        >
+          {isSubmitting ? <CircularProgress size={20} /> : "Add"}
         </Button>
       </DialogActions>
     </Dialog>

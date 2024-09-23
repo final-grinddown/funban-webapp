@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import AddIcon from "@mui/icons-material/Add"
 import { Box, Button, Grid } from "@mui/material"
 import {
@@ -21,7 +21,8 @@ interface Props {
 }
 
 export function TeamManagement({ users }: Props) {
-  const { sendMessage } = useWebSocketContext()
+  const { sendMessage, isLoading } = useWebSocketContext()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingNameId, setEditingNameId] = useState<number | null>(null)
   const [editingColorId, setEditingColorId] = useState<number | null>(null)
   const [deletingUserId, setDeletingUserId] = useState<number | null>(null)
@@ -37,24 +38,44 @@ export function TeamManagement({ users }: Props) {
   const handleAddNewUser = (name: string, color: string) => {
     const addUserMessage = createAddUserMessage(name, color)
     sendMessage(addUserMessage)
-    setIsAddModalOpen(false)
+    setIsSubmitting(true)
+  }
+
+  const handleOpenAddNewUserModal = () => {
+    setIsAddModalOpen(true)
+
+    if (isSubmitting) {
+      setIsSubmitting(false)
+    }
   }
 
   const handleEditNameClick = (id: number, name: string) => {
     setEditingNameId(id)
     setCurrentName(name)
+
+    if (isSubmitting) {
+      setIsSubmitting(false)
+    }
   }
 
   const handleEditColorClick = (id: number, color: string) => {
     const matchedColor = availableColors.find((c) => c.name.toLowerCase() === color.toLowerCase())?.name || color
     setEditingColorId(id)
     setCurrentColor(matchedColor)
+
+    if (isSubmitting) {
+      setIsSubmitting(false)
+    }
   }
 
   const handleDeleteClick = (id: number, name: string) => {
     setDeletingUserId(id)
     setDeletingUserName(name)
     setIsDeleteModalOpen(true)
+
+    if (isSubmitting) {
+      setIsSubmitting(false)
+    }
   }
 
   const handleCloseDeleteModal = () => {
@@ -66,7 +87,7 @@ export function TeamManagement({ users }: Props) {
     if (editingNameId !== null) {
       const message = createUpdateUserNameMessage(editingNameId, newName)
       sendMessage(message)
-      setEditingNameId(null)
+      setIsSubmitting(true)
     }
   }
 
@@ -74,7 +95,7 @@ export function TeamManagement({ users }: Props) {
     if (editingColorId !== null) {
       const updateColorMessage = createUpdateUserColorMessage(editingColorId, newColor)
       sendMessage(updateColorMessage)
-      setEditingColorId(null)
+      setIsSubmitting(true)
     }
   }
 
@@ -82,13 +103,33 @@ export function TeamManagement({ users }: Props) {
     if (deletingUserId !== null) {
       const deleteMessage = createDeleteUser(deletingUserId)
       sendMessage(deleteMessage)
-      handleCloseDeleteModal()
+      setIsSubmitting(true)
     }
   }
 
+  useEffect(() => {
+    if (isSubmitting && !isLoading) {
+      if (editingColorId) {
+        setEditingColorId(null)
+      }
+
+      if (editingNameId) {
+        setEditingNameId(null)
+      }
+
+      if (isAddModalOpen) {
+        setIsAddModalOpen(false)
+      }
+
+      if (deletingUserId) {
+        handleCloseDeleteModal()
+      }
+    }
+  }, [deletingUserId, editingColorId, editingNameId, isAddModalOpen, isLoading, isSubmitting])
+
   return (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
-      <Button variant="contained" sx={{ mb: 2 }} startIcon={<AddIcon />} onClick={() => setIsAddModalOpen(true)}>
+      <Button variant="contained" sx={{ mb: 2 }} startIcon={<AddIcon />} onClick={handleOpenAddNewUserModal}>
         Add new team member
       </Button>
       <Grid container spacing={2}>
@@ -110,6 +151,7 @@ export function TeamManagement({ users }: Props) {
           existingNames={existingNames}
           onClose={() => setIsAddModalOpen(false)}
           onSave={handleAddNewUser}
+          isSubmitting={isSubmitting}
         />
 
         <NameEditModal
@@ -118,6 +160,7 @@ export function TeamManagement({ users }: Props) {
           onClose={() => setEditingNameId(null)}
           onSave={handleSaveName}
           existingNames={existingNames}
+          isSubmitting={isSubmitting}
         />
 
         <ColorEditModal
@@ -126,6 +169,7 @@ export function TeamManagement({ users }: Props) {
           availableColors={availableColors}
           onClose={() => setEditingColorId(null)}
           onSave={handleSaveColor}
+          isSubmitting={isSubmitting}
         />
 
         <DeleteConfirmationModal
@@ -133,6 +177,7 @@ export function TeamManagement({ users }: Props) {
           userName={deletingUserName || ""}
           onClose={handleCloseDeleteModal}
           onConfirm={confirmDelete}
+          isSubmitting={isSubmitting}
         />
       </Grid>
     </Box>

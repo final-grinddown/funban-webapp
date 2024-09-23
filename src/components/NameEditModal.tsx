@@ -1,6 +1,15 @@
 import { useEffect } from "react"
 import CloseIcon from "@mui/icons-material/Close"
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField } from "@mui/material"
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  TextField,
+} from "@mui/material"
 import { Controller, useForm } from "react-hook-form"
 
 interface Props {
@@ -9,13 +18,14 @@ interface Props {
   existingNames: string[]
   onClose: () => void
   onSave: (newName: string) => void
+  isSubmitting: boolean
 }
 
 interface FormInputs {
   name: string
 }
 
-export function NameEditModal({ isOpen, initialName, existingNames, onClose, onSave }: Props) {
+export function NameEditModal({ isOpen, initialName, existingNames, onClose, onSave, isSubmitting }: Props) {
   const {
     control,
     handleSubmit,
@@ -28,7 +38,6 @@ export function NameEditModal({ isOpen, initialName, existingNames, onClose, onS
 
   const onSubmit = (data: FormInputs) => {
     onSave(data.name)
-    onClose()
   }
 
   useEffect(() => {
@@ -82,12 +91,18 @@ export function NameEditModal({ isOpen, initialName, existingNames, onClose, onS
           />
         </form>
       </DialogContent>
-      <DialogActions sx={{ px: 3 }}>
+      <DialogActions sx={{ px: 3, alignItems: "stretch" }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isValid || !isDirty}>
-          Save
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          color="primary"
+          variant="contained"
+          disabled={isSubmitting || !isValid || !isDirty}
+          sx={{ width: "72px" }}
+        >
+          {isSubmitting ? <CircularProgress size={20} /> : "Save"}
         </Button>
       </DialogActions>
     </Dialog>

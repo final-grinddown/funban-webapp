@@ -3,6 +3,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,14 +20,14 @@ interface Props {
   availableColors: { name: string; value: string }[]
   onClose: () => void
   onSave: (newColor: string) => void
+  isSubmitting: boolean
 }
 
-export function ColorEditModal({ isOpen, currentColor, availableColors, onClose, onSave }: Props) {
+export function ColorEditModal({ isOpen, currentColor, availableColors, onClose, onSave, isSubmitting }: Props) {
   const [selectedColor, setSelectedColor] = useState(currentColor)
 
   const handleSave = () => {
     onSave(selectedColor)
-    onClose()
   }
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export function ColorEditModal({ isOpen, currentColor, availableColors, onClose,
           </Grid>
         </RadioGroup>
       </DialogContent>
-      <DialogActions sx={{ px: 3 }}>
+      <DialogActions sx={{ px: 3, alignItems: "stretch" }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
@@ -96,9 +97,10 @@ export function ColorEditModal({ isOpen, currentColor, availableColors, onClose,
           onClick={handleSave}
           color="primary"
           variant="contained"
-          disabled={selectedColor === currentColor} // Disable if color is not changed
+          disabled={isSubmitting || selectedColor === currentColor}
+          sx={{ width: "72px" }}
         >
-          Save
+          {isSubmitting ? <CircularProgress size={20} /> : "Save"}
         </Button>
       </DialogActions>
     </Dialog>
