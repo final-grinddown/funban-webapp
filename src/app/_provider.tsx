@@ -1,8 +1,8 @@
 "use client"
 import { ReactNode, useEffect, useState } from "react"
-import { CssBaseline, ThemeProvider } from "@mui/material"
+import { Box, CssBaseline, ThemeProvider } from "@mui/material"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter"
-import { Theme } from "@mui/system"
+import { GlobalStyles, Theme } from "@mui/system"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { client } from "@/app/api/client"
@@ -40,7 +40,17 @@ export default function Provider({ children }: Props) {
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          {children}
+          <GlobalStyles
+            styles={{
+              ".scrollable-container": {
+                scrollbarGutter: "stable both-edges",
+                overflowY: "auto",
+              },
+            }}
+          />
+          <Box className="scrollable-container" sx={{ maxHeight: "100vh", overflow: "auto" }}>
+            {children}
+          </Box>
         </ThemeProvider>
         <ReactQueryDevtools buttonPosition="bottom-left" />
       </AppRouterCacheProvider>

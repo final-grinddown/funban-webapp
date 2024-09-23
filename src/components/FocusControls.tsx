@@ -21,6 +21,7 @@ export function FocusControls({ onPrevUser, onNextUser, onEndFocus, isFocus }: F
           right: { xs: "auto", sm: 20 },
           position: "fixed",
         }}
+        className="mui-fixed"
         display="flex"
         flexWrap="wrap"
         justifyContent={{ xs: "center", sm: "flex-end" }}
