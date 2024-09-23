@@ -12,7 +12,7 @@ import {
   Snackbar,
   TextField,
 } from "@mui/material"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Controller, useForm, useWatch } from "react-hook-form"
 import { postSnapshot } from "@/app/api/fetches"
 import { IRawNote } from "@/utils/interfaces"
@@ -25,6 +25,7 @@ interface Props {
 }
 
 export function EndStatusModal({ notes, accessToken, isOpen, onClose }: Props) {
+  const queryClient = useQueryClient()
   const {
     control,
     handleSubmit,
@@ -56,6 +57,7 @@ export function EndStatusModal({ notes, accessToken, isOpen, onClose }: Props) {
       setSnackbarMessage("Snapshot sent successfully!")
       setSnackbarSeverity("success")
       setSnackbarOpen(true)
+      queryClient.invalidateQueries({ queryKey: ["history"] })
     },
     onError: (error: Error) => {
       onClose()
