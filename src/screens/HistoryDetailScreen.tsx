@@ -44,7 +44,7 @@ export function HistoryDetailScreen({ id }: { id: string }) {
   return (
     <Box>
       <Typography variant="h1" component="h1">
-        History Detail for ID: {id}
+        History Detail for: {data?.label}
       </Typography>
       <Board notes={notes} isEditable={false} />
     </Box>
