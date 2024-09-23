@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from "react"
+import { SyntheticEvent, useEffect, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import EditNoteIcon from "@mui/icons-material/EditNote"
@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CircularProgress,
   Divider,
   IconButton,
   ListItemIcon,
@@ -32,7 +33,7 @@ interface Props extends INote {
 }
 
 export function BoardItemCard({ text, name, color, state, updated, created, avatarUrl, id, isEditable }: Props) {
-  const { sendMessage } = useWebSocketContext()
+  const { sendMessage, isLoading } = useWebSocketContext()
   const { isFocus, currentUser } = useFocusStateStore()
   const theme = useTheme()
   const matchedColor = matchColorName(color, availableColors) || "#000000"
@@ -40,6 +41,7 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const openMenu = Boolean(anchorEl)
   const contrastColor = theme.palette.getContrastText(matchedColor)
   const dateToShow = updated
@@ -48,6 +50,10 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
 
   const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
+
+    if (isSubmitting) {
+      setIsSubmitting(false)
+    }
   }
 
   const handleCloseMenu = () => {
@@ -75,8 +81,14 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
   const handleCloneNote = () => {
     const message = createCloneNote(id.toString())
     sendMessage(message)
-    handleCloseMenu()
+    setIsSubmitting(true)
   }
+
+  useEffect(() => {
+    if (isSubmitting && !isLoading) {
+      handleCloseMenu()
+    }
+  }, [isLoading, isSubmitting])
 
   return (
     <>
@@ -136,10 +148,16 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
                     <ListItemText>Edit note</ListItemText>
                   </MenuItem>
                   <MenuItem onClick={handleCloneNote}>
-                    <ListItemIcon>
-                      <FileCopyIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Clone note</ListItemText>
+                    {isSubmitting ? (
+                      <CircularProgress size={24} sx={{ mx: "auto" }} />
+                    ) : (
+                      <>
+                        <ListItemIcon>
+                          <FileCopyIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Clone note</ListItemText>
+                      </>
+                    )}
                   </MenuItem>
                   <Divider />
                   <MenuItem onClick={handleDeleteOpenModal}>

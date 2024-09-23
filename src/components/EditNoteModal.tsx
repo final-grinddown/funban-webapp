@@ -1,7 +1,8 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -32,7 +33,8 @@ interface FormInputs {
 }
 
 export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: Props) {
-  const { sendMessage } = useWebSocketContext()
+  const { sendMessage, isLoading } = useWebSocketContext()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const {
     control,
     handleSubmit,
@@ -46,6 +48,7 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: 
   const onSubmit = (data: FormInputs) => {
     const hasTextChanged = data.text !== noteText
     const hasStateChanged = data.state !== noteState
+    setIsSubmitting(true)
 
     if (hasTextChanged && hasStateChanged) {
       const combinedMessage = createUpdateNote(noteId.toString(), data.text, data.state)
@@ -57,15 +60,23 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: 
       const message = createUpdateNoteReorder(noteId.toString(), data.state)
       sendMessage(message)
     }
-
-    onClose()
   }
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isLoading) {
       reset({ text: noteText, state: noteState })
+
+      if (isSubmitting) {
+        setIsSubmitting(false)
+      }
     }
-  }, [isOpen, noteState, noteText, reset])
+  }, [isLoading, isOpen, isSubmitting, noteState, noteText, reset])
+
+  useEffect(() => {
+    if (isSubmitting && !isLoading) {
+      onClose()
+    }
+  }, [isLoading, isSubmitting, onClose])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth>
@@ -112,12 +123,18 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: 
           />
         </form>
       </DialogContent>
-      <DialogActions sx={{ px: 3 }}>
+      <DialogActions sx={{ px: 3, alignItems: "stretch" }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isDirty}>
-          Save
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          color="primary"
+          variant="contained"
+          disabled={isSubmitting || !isDirty}
+          sx={{ width: "72px" }}
+        >
+          {isSubmitting ? <CircularProgress size={20} /> : "Save"}
         </Button>
       </DialogActions>
     </Dialog>

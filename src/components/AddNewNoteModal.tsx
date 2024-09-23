@@ -1,7 +1,8 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -31,7 +32,9 @@ interface FormInputs {
 }
 
 export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
-  const { sendMessage } = useWebSocketContext()
+  const { sendMessage, isLoading } = useWebSocketContext()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const {
     control,
     handleSubmit,
@@ -45,14 +48,24 @@ export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
   const onSubmit = (data: FormInputs) => {
     const message = createNewNote(data.owner, data.text, data.state)
     sendMessage(message)
-    onClose()
+    setIsSubmitting(true)
   }
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isLoading) {
       reset({ text: "", state: "", owner: "" })
+
+      if (isSubmitting) {
+        setIsSubmitting(false)
+      }
     }
-  }, [isOpen, reset])
+  }, [isLoading, isOpen, isSubmitting, reset])
+
+  useEffect(() => {
+    if (isSubmitting && !isLoading) {
+      onClose()
+    }
+  }, [isLoading, isSubmitting, onClose])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth>
@@ -116,12 +129,18 @@ export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
           />
         </form>
       </DialogContent>
-      <DialogActions sx={{ px: 3 }}>
+      <DialogActions sx={{ px: 3, alignItems: "stretch" }}>
         <Button onClick={onClose} color="secondary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={!isDirty || !isValid}>
-          Create
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          color="primary"
+          variant="contained"
+          disabled={isSubmitting || !isDirty || !isValid}
+          sx={{ width: "92px" }}
+        >
+          {isSubmitting ? <CircularProgress size={20} /> : "Create"}
         </Button>
       </DialogActions>
     </Dialog>

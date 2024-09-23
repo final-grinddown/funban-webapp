@@ -9,6 +9,7 @@ interface WebSocketContextType {
   notes: INote[]
   sendMessage: (message: string) => void
   connectionStatus: string
+  isLoading: boolean
 }
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL
@@ -23,6 +24,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const socketRef = useRef<WebSocket | null>(null)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(false)
   const lastUUIDRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           case "ActionFinished":
             if (op.uuid === lastUUIDRef.current) {
               setSnackbarOpen(true)
+              setIsLoading(false)
             }
             break
           default:
@@ -167,6 +170,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
       if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         socketRef.current.send(messageWithUUID)
+        setIsLoading(true)
       } else {
         console.error("WebSocket is not open. Unable to send message.")
       }
@@ -203,7 +207,9 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, [socketUrl, connectWebSocket])
 
   return (
-    <WebSocketContext.Provider value={{ users, notes, sendMessage, connectionStatus: getConnectionStatus() }}>
+    <WebSocketContext.Provider
+      value={{ users, notes, sendMessage, connectionStatus: getConnectionStatus(), isLoading }}
+    >
       {children}
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" variant="filled" sx={{ width: "100%" }}>
