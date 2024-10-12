@@ -8,10 +8,10 @@ interface Props {
   title: string
   items: INote[]
   isEditable: boolean
-  hoveredColumn: string | null // Know which column is hovered
-  setHoveredColumn: (columnId: string | null) => void // Function to set the hovered column
+  hoveredColumn: string | null
+  setHoveredColumn: (columnId: string | null) => void
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
-  onDrop: (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => void // Add index to onDrop to handle position
+  onDrop: (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => void
   onDragEnd: () => void
 }
 
@@ -25,12 +25,12 @@ export function BoardColumn({
   onDragEnd,
   onDrop,
 }: Props) {
-  const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null) // Track where to show the placeholder
+  const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null)
   const lastHoveredRef = useRef<string | null>(null)
 
   // Calculate the position based on Y-coordinate
   const handleDragOver = (event: DragEvent<HTMLDivElement>, index: number, element: HTMLElement) => {
-    event.preventDefault() // Allow drop
+    event.preventDefault()
 
     if (lastHoveredRef.current !== title) {
       lastHoveredRef.current = title
@@ -44,13 +44,11 @@ export function BoardColumn({
       // If mouse is above the midpoint of the card, show placeholder before the card
       if (draggedOverIndex !== index) {
         setDraggedOverIndex(index)
-        console.log(`Drag over column: ${title}, place before card at index: ${index}`)
       }
     } else {
       // If mouse is below the midpoint, show placeholder after the card
       if (draggedOverIndex !== index + 1) {
         setDraggedOverIndex(index + 1)
-        console.log(`Drag over column: ${title}, place after card at index: ${index}`)
       }
     }
   }
@@ -60,29 +58,26 @@ export function BoardColumn({
 
     // If no valid index, return (for edge cases)
     if (draggedOverIndex === null) {
-      console.log("No valid drop position detected.")
       return
     }
 
-    console.log(`Dropped on column: ${title}, index: ${draggedOverIndex}`)
-
-    // Trigger onDrop with the draggedOverIndex to indicate the exact position
     onDrop(event, title, draggedOverIndex)
 
-    setDraggedOverIndex(null) // Reset placeholder index after dropping
+    setDraggedOverIndex(null)
     lastHoveredRef.current = null
-    setHoveredColumn(null) // Reset the hovered column after dropping
+    setHoveredColumn(null)
   }
 
   const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
     const relatedTarget = event.relatedTarget as HTMLElement
+
     if (relatedTarget && event.currentTarget.contains(relatedTarget)) {
       return
     }
-    console.log(`Leaving column: ${title}`)
-    setDraggedOverIndex(null) // Reset placeholder when leaving the column
+
+    setDraggedOverIndex(null)
     lastHoveredRef.current = null
-    setHoveredColumn(null) // Reset the hovered column when leaving
+    setHoveredColumn(null)
   }
 
   return (
@@ -92,9 +87,9 @@ export function BoardColumn({
       minWidth={300}
       onDrop={handleDrop}
       onDragLeave={handleDragLeave}
-      onDragOver={(event) => event.preventDefault()} // Allow dragging over the column
+      onDragOver={(event) => event.preventDefault()}
       sx={{
-        border: hoveredColumn === title ? "2px dashed #1976d2" : "2px solid transparent", // Dashed border for hovered column
+        border: hoveredColumn === title ? "2px dashed #1976d2" : "2px solid transparent",
         transition: "border 0.3s ease",
         borderRadius: 2,
       }}
@@ -104,26 +99,16 @@ export function BoardColumn({
       </Box>
       <List>
         {items.map((item, index) => (
-          <div
-            key={item.id}
-            onDragOver={(event) => handleDragOver(event, index, event.currentTarget)} // Pass the current card element to calculate position
-          >
-            {/* Show placeholder at the current index */}
+          <div key={item.id} onDragOver={(event) => handleDragOver(event, index, event.currentTarget)}>
             {draggedOverIndex === index && (
-              <DragAndDropPlaceholder
-                onDragOver={(event) => event.preventDefault()} // Allow drag over
-                onDrop={handleDrop} // Handle the drop
-              />
+              <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
             )}
             <BoardItemCard {...item} isEditable={isEditable} onDragStart={onDragStart} onDragEnd={onDragEnd} />
           </div>
         ))}
-        {/* Show placeholder at the end if hovering over the empty space */}
+
         {draggedOverIndex === items.length && (
-          <DragAndDropPlaceholder
-            onDragOver={(event) => event.preventDefault()} // Allow drag over for the last position
-            onDrop={handleDrop} // Handle the drop at the end
-          />
+          <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
         )}
       </List>
     </Box>
