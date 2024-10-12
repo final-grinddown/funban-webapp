@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect, useState } from "react"
+import { DragEvent, SyntheticEvent, useEffect, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import EditNoteIcon from "@mui/icons-material/EditNote"
@@ -29,10 +29,24 @@ import { EditNoteModal } from "./EditNoteModal"
 
 interface Props extends INote {
   isEditable: boolean
+  onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
+  onDragEnd: () => void
   avatarUrl?: string
 }
 
-export function BoardItemCard({ text, name, color, state, updated, created, avatarUrl, id, isEditable }: Props) {
+export function BoardItemCard({
+  text,
+  name,
+  color,
+  state,
+  updated,
+  created,
+  avatarUrl,
+  id,
+  isEditable,
+  onDragStart,
+  onDragEnd,
+}: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const { isFocus, currentUser } = useFocusStateStore()
   const theme = useTheme()
@@ -84,6 +98,14 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
     setIsSubmitting(true)
   }
 
+  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
+    onDragStart(event, id.toString())
+  }
+
+  const handleDragEnd = () => {
+    onDragEnd()
+  }
+
   useEffect(() => {
     if (isSubmitting && !isLoading) {
       handleCloseMenu()
@@ -93,6 +115,9 @@ export function BoardItemCard({ text, name, color, state, updated, created, avat
   return (
     <>
       <Card
+        draggable={isEditable}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         elevation={4}
         sx={{
           m: 2,
