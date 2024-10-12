@@ -90,11 +90,12 @@ export function createUpdateNoteText(id: string, text: string): string {
   return JSON.stringify(action)
 }
 
-export function createUpdateNoteReorder(id: string, destinationStatus: string): string {
+export function createUpdateNoteReorder(id: string, destinationStatus: string, newIndex?: number): string {
   const action: IUpdateReorderNote = {
     type: "Reorder",
     moved_item_id: parseInt(id),
     destination_status: destinationStatus,
+    new_index: newIndex ?? null,
   }
 
   return JSON.stringify(action)

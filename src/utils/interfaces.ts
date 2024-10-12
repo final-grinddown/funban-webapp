@@ -122,6 +122,7 @@ export interface IUpdateReorderNote {
   type: "Reorder"
   moved_item_id: number
   destination_status: string
+  new_index: number | null
 }
 
 export interface IHistoryItem {
