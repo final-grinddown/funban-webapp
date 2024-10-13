@@ -56,6 +56,8 @@ export function BoardItemCard({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [textFocus, setTextFocus] = useState(false)
   const openMenu = Boolean(anchorEl)
   const contrastColor = theme.palette.getContrastText(matchedColor)
   const dateToShow = updated
@@ -79,6 +81,16 @@ export function BoardItemCard({
     handleCloseMenu()
   }
 
+  const handleEditDoubleClickOpenModal = () => {
+    setTextFocus(true)
+    setIsEditModalOpen(true)
+    handleCloseMenu()
+  }
+
+  const handleClearTextFocus = () => {
+    setTextFocus(false)
+  }
+
   const handleEditCloseModal = () => {
     setIsEditModalOpen(false)
   }
@@ -100,10 +112,14 @@ export function BoardItemCard({
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     onDragStart(event, id.toString())
+    event.currentTarget.style.cursor = "grabbing"
+    setIsDragging(true)
   }
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (event: DragEvent<HTMLDivElement>) => {
     onDragEnd()
+    event.currentTarget.style.cursor = "grab"
+    setIsDragging(false)
   }
 
   useEffect(() => {
@@ -123,6 +139,7 @@ export function BoardItemCard({
           m: 2,
           opacity: isFocus && name !== currentUser ? 0.05 : 1,
           transition: "opacity 0.25s ease-out",
+          cursor: isEditable ? "grab" : "default",
         }}
       >
         <CardHeader
@@ -197,7 +214,24 @@ export function BoardItemCard({
           }
           sx={{ bgcolor: alpha(matchedColor, 0.75) }}
         />
-        <CardContent sx={{ p: 2 }}>
+        <CardContent
+          sx={{
+            p: 2,
+            position: "relative",
+            transition: "background-color 0.3s ease-in-out",
+            "&:hover": {
+              cursor: isEditable && !isDragging ? "context-menu" : "default",
+              bgcolor: isEditable && !isDragging ? alpha(theme.palette.primary.light, 0.15) : null,
+              animation: isEditable && !isDragging ? "pulsate 1.5s ease-in-out infinite" : null, // Apply pulsating effect
+            },
+            "@keyframes pulsate": {
+              "0%": { backgroundColor: alpha(theme.palette.primary.light, 0.15) },
+              "50%": { backgroundColor: alpha(theme.palette.primary.light, 0.25) },
+              "100%": { backgroundColor: alpha(theme.palette.primary.light, 0.15) },
+            },
+          }}
+          onDoubleClick={handleEditDoubleClickOpenModal}
+        >
           <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
             {text}
           </Typography>
@@ -212,6 +246,8 @@ export function BoardItemCard({
             noteState={state}
             noteText={text}
             onClose={handleEditCloseModal}
+            hasTextFocus={textFocus}
+            clearTextFocus={handleClearTextFocus}
           />
 
           <DeleteNoteModal isOpen={isDeleteModalOpen} noteId={id} onClose={handleDeleteCloseModal} />
