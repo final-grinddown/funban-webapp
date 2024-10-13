@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import {
   Button,
@@ -25,6 +25,8 @@ interface Props {
   noteState: INote["state"]
   noteText: INote["text"]
   onClose: () => void
+  hasTextFocus?: boolean
+  clearTextFocus?: () => void
 }
 
 interface FormInputs {
@@ -32,9 +34,10 @@ interface FormInputs {
   state: string
 }
 
-export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: Props) {
+export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose, hasTextFocus, clearTextFocus }: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const {
     control,
     handleSubmit,
@@ -66,11 +69,24 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: 
     if (isOpen && !isLoading) {
       reset({ text: noteText, state: noteState })
 
+      // Delay to ensure inputRef is set
+      setTimeout(() => {
+        if (hasTextFocus && inputRef.current) {
+          const inputElement = inputRef.current
+          inputElement.focus()
+          inputElement.setSelectionRange(0, inputElement.value.length)
+
+          if (clearTextFocus) {
+            clearTextFocus()
+          }
+        }
+      }, 0)
+
       if (isSubmitting) {
         setIsSubmitting(false)
       }
     }
-  }, [isLoading, isOpen, isSubmitting, noteState, noteText, reset])
+  }, [clearTextFocus, hasTextFocus, isLoading, isOpen, isSubmitting, noteState, noteText, reset])
 
   useEffect(() => {
     if (isSubmitting && !isLoading) {
@@ -79,7 +95,7 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: 
   }, [isLoading, isSubmitting, onClose])
 
   return (
-    <Dialog open={isOpen} onClose={onClose} fullWidth>
+    <Dialog open={isOpen} onClose={onClose} fullWidth={true} disableRestoreFocus={true}>
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 0 }}>
         Edit Note
         <IconButton edge="end" color="inherit" onClick={onClose}>
@@ -110,6 +126,8 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose }: 
             render={({ field }) => (
               <TextField
                 {...field}
+                inputRef={inputRef}
+                autoFocus={hasTextFocus}
                 label="Note Text"
                 multiline
                 minRows={4}

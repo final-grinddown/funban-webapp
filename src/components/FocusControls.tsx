@@ -14,20 +14,16 @@ export function FocusControls({ onPrevUser, onNextUser, onEndFocus, isFocus }: F
   return (
     <Zoom in={isFocus} timeout={{ enter: 350, exit: 500 }} unmountOnExit>
       <Box
-        sx={{
-          bottom: 20,
-          left: { xs: "50%", sm: "auto" },
-          transform: { xs: "translateX(-50%)", sm: "none" },
-          right: { xs: "auto", sm: 20 },
-          position: "fixed",
-        }}
         className="mui-fixed"
         display="flex"
         flexWrap="wrap"
         justifyContent={{ xs: "center", sm: "flex-end" }}
         width="100%"
         gap={2}
-        px={2}
+        pr={2}
+        right={{ xs: "auto", sm: 20 }}
+        bottom={20}
+        position="fixed"
       >
         <Fab variant="extended" onClick={onPrevUser}>
           <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />

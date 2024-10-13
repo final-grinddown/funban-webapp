@@ -114,7 +114,15 @@ export function SignInScreen() {
                 helperText={errors.password ? errors.password.message : ""}
               />
 
-              <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth={true}
+                disabled={loading}
+                sx={{ height: "44px" }}
+              >
                 {loading ? <CircularProgress size={24} /> : "Sign In"}
               </Button>
             </Box>

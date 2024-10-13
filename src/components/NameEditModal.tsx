@@ -61,7 +61,7 @@ export function NameEditModal({ isOpen, initialName, existingNames, onClose, onS
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ height: { xs: "100px", sm: "80px" } }}>
+      <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name="name"
