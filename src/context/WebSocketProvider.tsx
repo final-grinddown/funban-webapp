@@ -2,6 +2,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { Alert, Snackbar } from "@mui/material"
 import { useSession } from "next-auth/react"
+import { clearApp } from "@/app/api/auth/clearApp"
 import { IExtendedSession, INote, IUser } from "@/utils/interfaces"
 
 interface WebSocketContextType {
@@ -123,12 +124,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const connectWebSocket = useCallback(() => {
     socketRef.current = new WebSocket(socketUrl!)
 
-    socketRef.current.onopen = () => {
-      console.log("WebSocket connection opened")
-    }
-
     socketRef.current.onmessage = (event) => {
-      console.log("WebSocket message received...", event.data)
       const msg = JSON.parse(event.data)
 
       if (msg.type === "Patch") {
@@ -141,16 +137,13 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     }
 
     socketRef.current.onclose = (event) => {
-      console.log("WebSocket connection closed", event)
-
       setTimeout(() => {
-        console.log(`Reconnecting WebSocket...`)
         connectWebSocket() // Attempt to reconnect
       }, 1000)
     }
 
     socketRef.current.onerror = (error) => {
-      console.error("WebSocket error", error)
+      clearApp()
     }
   }, [socketUrl, handlePatchMessage])
 
