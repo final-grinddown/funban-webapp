@@ -3,6 +3,7 @@
 import { ReactNode, SyntheticEvent, useEffect, useState } from "react"
 import { Box, CircularProgress, Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { useRouter } from "next/navigation"
+import { BoardConfiguration } from "@/components/BoardConfiguration"
 import { TeamManagement } from "@/components/TeamManagement"
 import { IUser } from "@/utils/interfaces"
 
@@ -83,8 +84,7 @@ export function SettingsScreen({ users }: Props) {
           <TeamManagement users={users} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <Typography variant="h6">Board Configuration</Typography>
-          {/* Add UI for board column settings, like column names and counts */}
+          <BoardConfiguration />
         </CustomTabPanel>
       </Box>
     </>

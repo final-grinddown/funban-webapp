@@ -2,7 +2,7 @@ import { DragEvent, useMemo, useRef, useState } from "react"
 import { Box, Divider, Stack } from "@mui/material"
 import { createUpdateNoteReorder } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
-import { INote } from "@/utils/interfaces"
+import { IColumn, INote } from "@/utils/interfaces"
 import { BackdropLoading } from "./BackdropLoading"
 import { BoardColumn } from "./BoardColumn"
 
@@ -16,8 +16,26 @@ export function Board({ notes, isEditable }: Props) {
   const draggingItemIdRef = useRef<string | null>(null)
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
 
-  const columns = useMemo(
-    () => [
+  // Prefix for localStorage key
+  const STORAGE_KEY = "funban-column-order"
+
+  // Default column order
+  const defaultOrder: IColumn[] = [
+    { title: "NOTES", orderKey: 0 },
+    { title: "TODO", orderKey: 1 },
+    { title: "IN PROGRESS", orderKey: 2 },
+    { title: "DONE", orderKey: 3 },
+  ]
+
+  // State for column order
+  const [columnOrder] = useState<IColumn[]>(() => {
+    const savedOrder = localStorage.getItem(STORAGE_KEY)
+
+    return savedOrder ? JSON.parse(savedOrder) : defaultOrder
+  })
+
+  const columns = useMemo(() => {
+    const columnData = [
       {
         title: "NOTES",
         items: notes.filter((note) => note.state === "notes").sort((a, b) => a.index - b.index),
@@ -34,9 +52,15 @@ export function Board({ notes, isEditable }: Props) {
         title: "DONE",
         items: notes.filter((note) => note.state === "done").sort((a, b) => a.index - b.index),
       },
-    ],
-    [notes],
-  )
+    ]
+
+    return columnData.sort((a, b) => {
+      const orderA = columnOrder.find((col) => col.title === a.title)?.orderKey ?? 0
+      const orderB = columnOrder.find((col) => col.title === b.title)?.orderKey ?? 0
+
+      return orderA - orderB
+    })
+  }, [notes, columnOrder])
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>, itemId: string) => {
     draggingItemIdRef.current = itemId

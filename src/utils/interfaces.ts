@@ -144,3 +144,8 @@ export interface ISnapshotData {
   label: string
   notes: IRawNote[]
 }
+
+export interface IColumn {
+  title: string
+  orderKey: number
+}
