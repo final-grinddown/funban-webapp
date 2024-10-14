@@ -40,6 +40,7 @@ export function Board({ notes, isEditable }: Props) {
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>, itemId: string) => {
     draggingItemIdRef.current = itemId
+    event.stopPropagation()
   }
 
   const handleDrop = (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => {
@@ -53,7 +54,10 @@ export function Board({ notes, isEditable }: Props) {
 
     const newState = columnId.toLowerCase().replace(" ", "_")
 
-    const message = createUpdateNoteReorder(draggedNote.id.toString(), newState, index)
+    // Ensure that the index is handled correctly for empty columns
+    const newIndex = index !== null && index !== undefined ? index : 0
+
+    const message = createUpdateNoteReorder(draggedNote.id.toString(), newState, newIndex)
     sendMessage(message)
 
     draggingItemIdRef.current = null

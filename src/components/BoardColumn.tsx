@@ -27,6 +27,7 @@ export function BoardColumn({
 }: Props) {
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null)
   const lastHoveredRef = useRef<string | null>(null)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   // Calculate the position based on Y-coordinate
   const handleDragOver = (event: DragEvent<HTMLDivElement>, index: number, element: HTMLElement) => {
@@ -34,7 +35,7 @@ export function BoardColumn({
 
     if (lastHoveredRef.current !== title) {
       lastHoveredRef.current = title
-      setHoveredColumn(title) // Update the hovered column
+      setHoveredColumn(title)
     }
 
     const boundingRect = element.getBoundingClientRect()
@@ -56,14 +57,14 @@ export function BoardColumn({
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault()
 
-    // If no valid index, return (for edge cases)
     if (draggedOverIndex === null) {
-      return
+      setDraggedOverIndex(0) // If the column is empty, drop the item at index 0
     }
 
-    onDrop(event, title, draggedOverIndex)
+    onDrop(event, title, draggedOverIndex ?? 0)
 
     setDraggedOverIndex(null)
+    setIsDraggingOver(false)
     lastHoveredRef.current = null
     setHoveredColumn(null)
   }
@@ -76,8 +77,13 @@ export function BoardColumn({
     }
 
     setDraggedOverIndex(null)
+    setIsDraggingOver(false)
     lastHoveredRef.current = null
     setHoveredColumn(null)
+  }
+
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
+    setIsDraggingOver(true)
   }
 
   return (
@@ -87,7 +93,8 @@ export function BoardColumn({
       minWidth={300}
       onDrop={handleDrop}
       onDragLeave={handleDragLeave}
-      onDragOver={(event) => event.preventDefault()}
+      onDragEnter={handleDragEnter}
+      onDragOver={(event) => event.preventDefault()} // Allow dragging over empty columns
       sx={{
         border: hoveredColumn === title ? "2px dashed #1976d2" : "2px solid transparent",
         transition: "border 0.3s ease",
@@ -98,6 +105,10 @@ export function BoardColumn({
         <Typography variant="h2">{title}</Typography>
       </Box>
       <List>
+        {items.length === 0 && isDraggingOver && (
+          <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} />
+        )}
+
         {items.map((item, index) => (
           <div key={item.id} onDragOver={(event) => handleDragOver(event, index, event.currentTarget)}>
             {draggedOverIndex === index && (

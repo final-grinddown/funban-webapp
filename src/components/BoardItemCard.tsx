@@ -114,6 +114,7 @@ export function BoardItemCard({
     onDragStart(event, id.toString())
     event.currentTarget.style.cursor = "grabbing"
     setIsDragging(true)
+    event.dataTransfer.effectAllowed = "move"
   }
 
   const handleDragEnd = (event: DragEvent<HTMLDivElement>) => {
