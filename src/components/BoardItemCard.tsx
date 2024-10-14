@@ -4,7 +4,6 @@ import EditIcon from "@mui/icons-material/Edit"
 import EditNoteIcon from "@mui/icons-material/EditNote"
 import FileCopyIcon from "@mui/icons-material/FileCopy"
 import {
-  Avatar,
   Card,
   CardContent,
   CardHeader,
@@ -27,11 +26,12 @@ import { useFocusStateStore } from "@/utils/store"
 import { DeleteNoteModal } from "./DeleteNoteModal"
 import { EditNoteModal } from "./EditNoteModal"
 
+const HEADER_CONFIG_KEY = "funban-header-config"
+
 interface Props extends INote {
   isEditable: boolean
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
   onDragEnd: () => void
-  avatarUrl?: string
 }
 
 export function BoardItemCard({
@@ -41,7 +41,6 @@ export function BoardItemCard({
   state,
   updated,
   created,
-  avatarUrl,
   id,
   isEditable,
   onDragStart,
@@ -51,7 +50,6 @@ export function BoardItemCard({
   const { isFocus, currentUser } = useFocusStateStore()
   const theme = useTheme()
   const matchedColor = matchColorName(color, availableColors) || "#000000"
-  const avatarInitial = name.charAt(0).toUpperCase()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -60,9 +58,11 @@ export function BoardItemCard({
   const [textFocus, setTextFocus] = useState(false)
   const openMenu = Boolean(anchorEl)
   const contrastColor = theme.palette.getContrastText(matchedColor)
-  const dateToShow = updated
-    ? `Updated at ${new Date(updated).toLocaleString()}`
-    : `Created at ${new Date(created).toLocaleString()}`
+  const dateToShow =
+    updated && updated !== created
+      ? `Updated at ${new Date(updated).toLocaleString()}`
+      : `Created at ${new Date(created).toLocaleString()}`
+  const headerConfig = localStorage.getItem(HEADER_CONFIG_KEY) || "updated_only"
 
   const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -144,7 +144,6 @@ export function BoardItemCard({
         }}
       >
         <CardHeader
-          avatar={<Avatar src={avatarUrl}>{!avatarUrl && avatarInitial}</Avatar>}
           title={
             <Typography
               variant="h6"
@@ -159,9 +158,25 @@ export function BoardItemCard({
             </Typography>
           }
           subheader={
-            <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
-              {dateToShow}
-            </Typography>
+            <>
+              {headerConfig === "updated_only" && (
+                <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
+                  {dateToShow}
+                </Typography>
+              )}
+              {headerConfig === "created_updated" && (
+                <>
+                  <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
+                    Created at {new Date(created).toLocaleString()}
+                  </Typography>
+                  {updated && (
+                    <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
+                      Updated at {new Date(created).toLocaleString()}
+                    </Typography>
+                  )}
+                </>
+              )}
+            </>
           }
           action={
             isEditable &&
@@ -213,7 +228,9 @@ export function BoardItemCard({
               </>
             )
           }
-          sx={{ bgcolor: alpha(matchedColor, 0.75) }}
+          sx={{
+            bgcolor: alpha(matchedColor, 0.75),
+          }}
         />
         <CardContent
           sx={{

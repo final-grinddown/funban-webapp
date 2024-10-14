@@ -1,10 +1,21 @@
-import { DragEvent, useState } from "react"
+import { ChangeEvent, DragEvent, useState } from "react"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
-import { Box, Card, Grid, IconButton, Typography } from "@mui/material"
+import {
+  Box,
+  Card,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Radio,
+  RadioGroup,
+  Typography,
+} from "@mui/material"
 import { IColumn } from "@/utils/interfaces"
 
 const STORAGE_KEY = "funban-column-order"
+const HEADER_CONFIG_KEY = "funban-header-config"
 
 export function BoardConfiguration() {
   const initialColumns: IColumn[] = [
@@ -17,6 +28,11 @@ export function BoardConfiguration() {
   const [columns, setColumns] = useState<IColumn[]>(() => {
     const savedOrder = localStorage.getItem(STORAGE_KEY)
     return savedOrder ? JSON.parse(savedOrder) : initialColumns
+  })
+
+  const [headerOption, setHeaderOption] = useState<string>(() => {
+    const savedHeaderConfig = localStorage.getItem(HEADER_CONFIG_KEY)
+    return savedHeaderConfig ? savedHeaderConfig : "updated_only"
   })
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -91,6 +107,12 @@ export function BoardConfiguration() {
     setColumns(reorderedColumns)
   }
 
+  const handleHeaderOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value
+    setHeaderOption(newValue)
+    localStorage.setItem(HEADER_CONFIG_KEY, newValue)
+  }
+
   return (
     <>
       <Typography variant="h2">Column Order Configuration</Typography>
@@ -146,6 +168,22 @@ export function BoardConfiguration() {
             </Grid>
           ))}
       </Grid>
+
+      <Typography variant="h2" mt={6} mb={2}>
+        Card Header Configuration
+      </Typography>
+      <FormControl component="fieldset">
+        <RadioGroup
+          aria-label="card-header-options"
+          name="card-header-options"
+          value={headerOption}
+          onChange={handleHeaderOptionChange}
+        >
+          <FormControlLabel value="no_time" control={<Radio />} label="Show No time" />
+          <FormControlLabel value="updated_only" control={<Radio />} label="Show Updated only" />
+          <FormControlLabel value="created_updated" control={<Radio />} label="Show Created and Updated" />
+        </RadioGroup>
+      </FormControl>
     </>
   )
 }
