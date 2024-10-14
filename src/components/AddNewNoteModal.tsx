@@ -17,6 +17,7 @@ import {
 import { Controller, useForm } from "react-hook-form"
 import { createNewNote } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
+import { handleKeyDownSubmit } from "@/utils/helpers"
 import { IUser } from "@/utils/interfaces"
 
 interface Props {
@@ -124,6 +125,7 @@ export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
                 sx={{ my: 2 }}
                 error={!!errors.text}
                 helperText={errors.text ? errors.text.message : ""}
+                onKeyDown={(event) => handleKeyDownSubmit(event, handleSubmit, onSubmit, !isDirty || !isValid)}
               />
             )}
           />

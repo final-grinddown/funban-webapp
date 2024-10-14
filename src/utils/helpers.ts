@@ -1,3 +1,4 @@
+import type { BaseSyntheticEvent, KeyboardEvent } from "react"
 import { TThemeMode } from "@/utils/types"
 import { INote, IRawNote } from "./interfaces"
 
@@ -93,4 +94,29 @@ export function base64DecodeUnicode(base64Str: string): string {
   const decodedStr = Array.from(binaryStr, (char) => String.fromCharCode(char.charCodeAt(0)))
 
   return decodeURIComponent(decodedStr.join(""))
+}
+
+/**
+ * Handles the keydown event for a div element, triggering a submit action if Shift+Enter is pressed.
+ *
+ * This function checks if the Shift key is pressed along with the Enter key, and if so, it prevents
+ * the default action and stops the event propagation. It then calls the handleSubmit function with
+ * the onSubmit function as an argument to trigger the submit action.
+ *
+ * @param event - The keydown event object for the div element.
+ * @param handleSubmit - The function that returns a submit handler function when called with onSubmit.
+ * @param onSubmit - The submit handler function to be called when Shift+Enter is pressed.
+ * @param isDisabled - A boolean value indicating whether the submit action is disabled.
+ */
+export function handleKeyDownSubmit<T>(
+  event: KeyboardEvent<HTMLDivElement>,
+  handleSubmit: (onSubmit: (data: T) => void) => (e?: BaseSyntheticEvent) => void,
+  onSubmit: (data: T) => void,
+  isDisabled: boolean,
+) {
+  if (event.shiftKey && event.key === "Enter" && !isDisabled) {
+    event.preventDefault()
+    event.stopPropagation()
+    handleSubmit(onSubmit)()
+  }
 }

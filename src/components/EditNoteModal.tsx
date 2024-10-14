@@ -17,6 +17,7 @@ import {
 import { Controller, useForm } from "react-hook-form"
 import { createUpdateNote, createUpdateNoteReorder, createUpdateNoteText } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
+import { handleKeyDownSubmit } from "@/utils/helpers"
 import { INote } from "@/utils/interfaces"
 
 interface Props {
@@ -37,6 +38,7 @@ interface FormInputs {
 export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose, hasTextFocus, clearTextFocus }: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSelectLocked, setIsSelectLocked] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const {
     control,
@@ -136,6 +138,7 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose, ha
                 sx={{ my: 2 }}
                 error={!!errors.text}
                 helperText={errors.text ? errors.text.message : ""}
+                onKeyDown={(event) => handleKeyDownSubmit(event, handleSubmit, onSubmit, !isDirty)}
               />
             )}
           />

@@ -3,6 +3,7 @@
 import { ReactNode, SyntheticEvent, useEffect, useState } from "react"
 import { Box, CircularProgress, Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { useRouter } from "next/navigation"
+import { BoardConfiguration } from "@/components/BoardConfiguration"
 import { TeamManagement } from "@/components/TeamManagement"
 import { IUser } from "@/utils/interfaces"
 
@@ -58,7 +59,7 @@ export function SettingsScreen({ users }: Props) {
   return (
     <>
       <Typography variant="h1">Settings</Typography>
-      <Box mt={2} display="flex" flexDirection="column" gap={2} justifyContent="space-between">
+      <Box my={2} display="flex" flexDirection="column" gap={2} justifyContent="space-between">
         <Box
           sx={{ borderBottom: 1, borderColor: "divider", borderTopRightRadius: 4, borderTopLeftRadius: 4 }}
           bgcolor={theme.palette.background.paper}
@@ -83,8 +84,7 @@ export function SettingsScreen({ users }: Props) {
           <TeamManagement users={users} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <Typography variant="h6">Board Configuration</Typography>
-          {/* Add UI for board column settings, like column names and counts */}
+          <BoardConfiguration />
         </CustomTabPanel>
       </Box>
     </>
