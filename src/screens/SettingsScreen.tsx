@@ -61,7 +61,7 @@ export function SettingsScreen({ users }: Props) {
       <Typography variant="h1">Settings</Typography>
       <Box my={2} display="flex" flexDirection="column" gap={2} justifyContent="space-between">
         <Box
-          sx={{ borderBottom: 1, borderColor: "divider", borderTopRightRadius: 4, borderTopLeftRadius: 4 }}
+          sx={{ borderBottom: 1, borderColor: "divider", borderTopRightRadius: 4, borderTopLeftRadius: 4, mb: 2 }}
           bgcolor={theme.palette.background.paper}
         >
           <Tabs
