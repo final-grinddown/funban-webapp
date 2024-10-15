@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
+import { format, formatDistanceToNow } from "date-fns"
 import { createCloneNote } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
@@ -58,10 +59,14 @@ export function BoardItemCard({
   const [textFocus, setTextFocus] = useState(false)
   const openMenu = Boolean(anchorEl)
   const contrastColor = theme.palette.getContrastText(matchedColor)
+  const updatedDate = format(new Date(updated), "dd/MM/yyyy, HH:mm")
+  const createdDate = format(new Date(created), "dd/MM/yyyy, HH:mm")
+  const updatedRelative = formatDistanceToNow(new Date(updated), { addSuffix: true })
+  const createdRelative = formatDistanceToNow(new Date(created), { addSuffix: true })
   const dateToShow =
     updated && updated !== created
-      ? `Updated at ${new Date(updated).toLocaleString()}`
-      : `Created at ${new Date(created).toLocaleString()}`
+      ? `Updated at ${isEditable ? updatedRelative : updatedDate}`
+      : `Created at ${isEditable ? createdRelative : createdDate}`
   const headerConfig = localStorage.getItem(HEADER_CONFIG_KEY) || "updated_only"
 
   const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => {
@@ -167,11 +172,11 @@ export function BoardItemCard({
               {headerConfig === "created_updated" && (
                 <>
                   <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
-                    Created at {new Date(created).toLocaleString()}
+                    {isEditable ? `Created ${createdRelative}` : `Created at ${createdDate}`}
                   </Typography>
                   {updated && (
                     <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
-                      Updated at {new Date(created).toLocaleString()}
+                      Updated at {updated !== created ? (isEditable ? updatedRelative : updatedDate) : "N/A"}
                     </Typography>
                   )}
                 </>
