@@ -86,7 +86,16 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           case "NoteOrderChanged":
             orderUpdated = true
             setNotes((prevNotes) =>
-              prevNotes.map((note) => (note.id === op.id ? { ...note, state: op.state, index: op.index } : note)),
+              prevNotes.map((note) =>
+                note.id === op.id
+                  ? {
+                      ...note,
+                      state: op.state,
+                      index: op.index,
+                      updated: new Date().toISOString(),
+                    }
+                  : note,
+              ),
             )
             break
           case "NoteRemoved":

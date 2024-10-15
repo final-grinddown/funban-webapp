@@ -1,4 +1,4 @@
-import { DragEvent, SyntheticEvent, useEffect, useState } from "react"
+import { DragEvent, SyntheticEvent, useCallback, useEffect, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import EditNoteIcon from "@mui/icons-material/EditNote"
@@ -17,11 +17,10 @@ import {
   Typography,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
-import { format, formatDistanceToNow } from "date-fns"
 import { createCloneNote } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
-import { matchColorName } from "@/utils/helpers"
+import { formatDateToShow, matchColorName } from "@/utils/helpers"
 import { INote } from "@/utils/interfaces"
 import { useFocusStateStore } from "@/utils/store"
 import { DeleteNoteModal } from "./DeleteNoteModal"
@@ -59,38 +58,35 @@ export function BoardItemCard({
   const [textFocus, setTextFocus] = useState(false)
   const openMenu = Boolean(anchorEl)
   const contrastColor = theme.palette.getContrastText(matchedColor)
-  const updatedDate = format(new Date(updated), "dd/MM/yyyy, HH:mm")
-  const createdDate = format(new Date(created), "dd/MM/yyyy, HH:mm")
-  const updatedRelative = formatDistanceToNow(new Date(updated), { addSuffix: true })
-  const createdRelative = formatDistanceToNow(new Date(created), { addSuffix: true })
+  const { updatedDate, createdDate, updatedRelative, createdRelative } = formatDateToShow(created, updated)
   const dateToShow =
     updated && updated !== created
       ? `Updated at ${isEditable ? updatedRelative : updatedDate}`
       : `Created at ${isEditable ? createdRelative : createdDate}`
   const headerConfig = localStorage.getItem(HEADER_CONFIG_KEY) || "updated_only"
 
-  const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
+  const handleMenu = useCallback(
+    (event: SyntheticEvent<HTMLButtonElement> | null) => {
+      setAnchorEl(event ? event.currentTarget : null)
 
-    if (isSubmitting) {
-      setIsSubmitting(false)
-    }
-  }
+      if (isSubmitting) setIsSubmitting(false)
+    },
+    [isSubmitting],
+  )
 
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
+  const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => handleMenu(event)
 
-  const handleEditOpenModal = () => {
+  const handleCloseMenu = useCallback(() => handleMenu(null), [handleMenu])
+
+  const handleEditModal = (focusText: boolean = false) => {
+    setTextFocus(focusText)
     setIsEditModalOpen(true)
     handleCloseMenu()
   }
 
-  const handleEditDoubleClickOpenModal = () => {
-    setTextFocus(true)
-    setIsEditModalOpen(true)
-    handleCloseMenu()
-  }
+  const handleEditOpenModal = () => handleEditModal()
+
+  const handleEditDoubleClickOpenModal = () => handleEditModal(true)
 
   const handleClearTextFocus = () => {
     setTextFocus(false)
@@ -115,31 +111,29 @@ export function BoardItemCard({
     setIsSubmitting(true)
   }
 
-  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
-    onDragStart(event, id.toString())
-    event.currentTarget.style.cursor = "grabbing"
-    setIsDragging(true)
-    event.dataTransfer.effectAllowed = "move"
-  }
-
-  const handleDragEnd = (event: DragEvent<HTMLDivElement>) => {
-    onDragEnd()
-    event.currentTarget.style.cursor = "grab"
-    setIsDragging(false)
+  const handleDrag = (event: DragEvent<HTMLDivElement>, isStarting: boolean) => {
+    if (isStarting) {
+      onDragStart(event, id.toString())
+      event.currentTarget.style.cursor = "grabbing"
+    } else {
+      onDragEnd()
+      event.currentTarget.style.cursor = "grab"
+    }
+    setIsDragging(isStarting)
   }
 
   useEffect(() => {
     if (isSubmitting && !isLoading) {
       handleCloseMenu()
     }
-  }, [isLoading, isSubmitting])
+  }, [handleCloseMenu, isLoading, isSubmitting])
 
   return (
     <>
       <Card
         draggable={isEditable}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragStart={(event) => handleDrag(event, true)}
+        onDragEnd={(event) => handleDrag(event, false)}
         elevation={4}
         sx={{
           m: 2,
@@ -176,7 +170,11 @@ export function BoardItemCard({
                   </Typography>
                   {updated && (
                     <Typography variant="body2" sx={{ color: alpha(contrastColor, 0.7) }}>
-                      Updated at {updated !== created ? (isEditable ? updatedRelative : updatedDate) : "N/A"}
+                      {updated !== created
+                        ? isEditable
+                          ? `Updated ${updatedRelative}`
+                          : `Updated at ${updatedDate}`
+                        : "N/A"}
                     </Typography>
                   )}
                 </>
