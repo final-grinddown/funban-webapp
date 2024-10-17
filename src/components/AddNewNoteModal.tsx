@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import {
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   MenuItem,
@@ -30,43 +32,54 @@ interface FormInputs {
   text: string
   state: string
   owner: string
+  saveAndCreateNext: boolean
 }
 
 export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const textAreaRef = useRef<HTMLInputElement>(null)
 
   const {
     control,
     handleSubmit,
     reset,
+    setFocus,
+    watch,
     formState: { errors, isDirty, isValid },
   } = useForm<FormInputs>({
-    defaultValues: { text: "", state: "", owner: "" },
+    defaultValues: { text: "", state: "", owner: "", saveAndCreateNext: false },
     mode: "onChange",
   })
+
+  const isSaveAndCreateNext = watch("saveAndCreateNext")
 
   const onSubmit = (data: FormInputs) => {
     const message = createNewNote(data.owner, data.text, data.state)
     sendMessage(message)
     setIsSubmitting(true)
+
+    if (data.saveAndCreateNext) {
+      reset({ text: "", state: data.state, owner: data.owner, saveAndCreateNext: data.saveAndCreateNext })
+
+      setTimeout(() => {
+        if (textAreaRef.current) {
+          textAreaRef.current.focus()
+        }
+      }, 0)
+    }
   }
 
   useEffect(() => {
     if (isOpen && !isLoading) {
-      reset({ text: "", state: "", owner: "" })
-
-      if (isSubmitting) {
-        setIsSubmitting(false)
+      if (!isSaveAndCreateNext && isSubmitting) {
+        reset({ text: "", state: "", owner: "", saveAndCreateNext: false })
+        onClose()
       }
-    }
-  }, [isLoading, isOpen, isSubmitting, reset])
 
-  useEffect(() => {
-    if (isSubmitting && !isLoading) {
-      onClose()
+      setIsSubmitting(false)
     }
-  }, [isLoading, isSubmitting, onClose])
+  }, [isLoading, isOpen, isSaveAndCreateNext, isSubmitting, onClose, reset, setFocus])
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth>
@@ -122,11 +135,19 @@ export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
                 minRows={4}
                 variant="outlined"
                 fullWidth={true}
-                sx={{ my: 2 }}
+                sx={{ mt: 2 }}
                 error={!!errors.text}
                 helperText={errors.text ? errors.text.message : ""}
+                inputRef={textAreaRef}
                 onKeyDown={(event) => handleKeyDownSubmit(event, handleSubmit, onSubmit, !isDirty || !isValid)}
               />
+            )}
+          />
+          <Controller
+            name="saveAndCreateNext"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel sx={{ mt: 1 }} control={<Checkbox {...field} />} label="Save and Create Next" />
             )}
           />
         </form>

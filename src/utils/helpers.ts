@@ -1,4 +1,5 @@
 import type { BaseSyntheticEvent, KeyboardEvent } from "react"
+import { format, formatDistanceToNow } from "date-fns"
 import { TThemeMode } from "@/utils/types"
 import { INote, IRawNote } from "./interfaces"
 
@@ -119,4 +120,24 @@ export function handleKeyDownSubmit<T>(
     event.stopPropagation()
     handleSubmit(onSubmit)()
   }
+}
+
+/**
+ * Formats the created and updated dates of a note into a user-friendly string format.
+ *
+ * This function takes the created and updated dates of a note and formats them into a string
+ * that includes both the date and time in the format "dd/MM/yyyy, HH:mm". It also generates
+ * a relative time string using the formatDistanceToNow function from date-fns, which returns
+ * a human-readable string representing the time elapsed since the given date.
+ *
+ * @param created - The created date of the note in ISO 8601 format.
+ * @param updated - The updated date of the note in ISO 8601 format.
+ */
+export const formatDateToShow = (created: string, updated: string) => {
+  const updatedDate = format(new Date(updated), "dd/MM/yyyy, HH:mm")
+  const createdDate = format(new Date(created), "dd/MM/yyyy, HH:mm")
+  const updatedRelative = formatDistanceToNow(new Date(updated), { addSuffix: true })
+  const createdRelative = formatDistanceToNow(new Date(created), { addSuffix: true })
+
+  return { updatedDate, createdDate, updatedRelative, createdRelative }
 }
