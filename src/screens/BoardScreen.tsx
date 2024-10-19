@@ -39,7 +39,7 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
       notes.map((note) => ({
         id: note.id.toString(),
         text: note.text,
-        state: note.state as "notes" | "todo" | "in_progress" | "done",
+        state: note.state,
         index: note.index,
         owner: { id: note.owner_id.toString(), name: note.name, color: note.color },
         updated: note.updated,
@@ -92,7 +92,7 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         </ButtonGroup>
       </Box>
 
-      <Board notes={notes} isEditable />
+      <Board notes={notes} isEditable={true} selectedUserId={parseInt(user)} />
 
       <AddNewNoteModal isOpen={isAddNewNoteModalOpen} onClose={handleCloseAddNewNoteModal} users={users} />
 

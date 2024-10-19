@@ -1,33 +1,66 @@
 import { DragEvent, useRef, useState } from "react"
-import { Box, List, Typography } from "@mui/material"
+import AddIcon from "@mui/icons-material/Add"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
+import { Box, IconButton, List, Typography, Menu, MenuItem, ListItemText, ListItemIcon } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { INote } from "@/utils/interfaces"
+import { AddNewNoteModal } from "./AddNewNoteModal"
 import { BoardItemCard } from "./BoardItemCard"
 import { DragAndDropPlaceholder } from "./DragAndDropPlaceholder"
 
 interface Props {
   title: string
   items: INote[]
+  state: INote["state"]
   isEditable: boolean
   hoveredColumn: string | null
   setHoveredColumn: (columnId: string | null) => void
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
   onDrop: (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => void
   onDragEnd: () => void
+  selectedUserId: number
 }
 
 export function BoardColumn({
   title,
   items,
+  state,
   isEditable,
   hoveredColumn,
   setHoveredColumn,
   onDragStart,
   onDragEnd,
   onDrop,
+  selectedUserId,
 }: Props) {
+  const { users } = useWebSocketContext()
+  const theme = useTheme()
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null)
   const lastHoveredRef = useRef<string | null>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const openMenu = Boolean(anchorEl)
+  const [isAddNewNoteModalOpen, setIsAddNewNoteModalOpen] = useState(false)
+  const [newNoteDefaultValues, setNewNoteDefaultValues] = useState({ state: "", ownerId: "" })
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
+
+  const handleOpenAddNewNoteModal = () => {
+    handleCloseMenu()
+    setNewNoteDefaultValues({ state: state, ownerId: String(selectedUserId) })
+    setIsAddNewNoteModalOpen(true)
+  }
+  const handleCloseAddNewNoteModal = () => {
+    setIsAddNewNoteModalOpen(false)
+    setNewNoteDefaultValues({ state: "", ownerId: "" })
+  }
 
   // Calculate the position based on Y-coordinate
   const handleDragOver = (event: DragEvent<HTMLDivElement>, index: number, element: HTMLElement) => {
@@ -101,8 +134,39 @@ export function BoardColumn({
         borderRadius: 2,
       }}
     >
-      <Box p={2} bgcolor="primary.main" sx={{ borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+      <Box
+        p={2}
+        bgcolor="primary.main"
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ borderTopLeftRadius: 4, borderTopRightRadius: 4 }}
+      >
         <Typography variant="h2">{title}</Typography>
+        <IconButton
+          onClick={handleOpenMenu}
+          aria-controls={openMenu ? "basic-column-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={openMenu ? "true" : undefined}
+          sx={{ borderRadius: "50%", padding: 1, border: `2px solid ${theme.palette.text.primary}` }}
+        >
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu}
+          onClose={handleCloseMenu}
+          MenuListProps={{
+            "aria-labelledby": "open edit note menu",
+          }}
+        >
+          <MenuItem onClick={handleOpenAddNewNoteModal}>
+            <ListItemIcon>
+              <AddIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Add new note</ListItemText>
+          </MenuItem>
+        </Menu>
       </Box>
       <List>
         {items.length === 0 && isDraggingOver && (
@@ -122,6 +186,13 @@ export function BoardColumn({
           <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
         )}
       </List>
+
+      <AddNewNoteModal
+        isOpen={isAddNewNoteModalOpen}
+        onClose={handleCloseAddNewNoteModal}
+        users={users}
+        defaultValues={newNoteDefaultValues}
+      />
     </Box>
   )
 }

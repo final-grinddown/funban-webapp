@@ -2,16 +2,17 @@ import { DragEvent, useMemo, useRef, useState } from "react"
 import { Box, Divider, Stack } from "@mui/material"
 import { createUpdateNoteReorder } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
-import { IColumn, INote } from "@/utils/interfaces"
+import { IColumn, IColumnData, INote } from "@/utils/interfaces"
 import { BackdropLoading } from "./BackdropLoading"
 import { BoardColumn } from "./BoardColumn"
 
 interface Props {
   notes: INote[]
   isEditable: boolean
+  selectedUserId: number
 }
 
-export function Board({ notes, isEditable }: Props) {
+export function Board({ notes, isEditable, selectedUserId }: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const draggingItemIdRef = useRef<string | null>(null)
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
@@ -35,21 +36,25 @@ export function Board({ notes, isEditable }: Props) {
   })
 
   const columns = useMemo(() => {
-    const columnData = [
+    const columnData: IColumnData[] = [
       {
         title: "NOTES",
+        state: "notes",
         items: notes.filter((note) => note.state === "notes").sort((a, b) => a.index - b.index),
       },
       {
         title: "TODO",
+        state: "todo",
         items: notes.filter((note) => note.state === "todo").sort((a, b) => a.index - b.index),
       },
       {
         title: "IN PROGRESS",
+        state: "in_progress",
         items: notes.filter((note) => note.state === "in_progress").sort((a, b) => a.index - b.index),
       },
       {
         title: "DONE",
+        state: "done",
         items: notes.filter((note) => note.state === "done").sort((a, b) => a.index - b.index),
       },
     ]
@@ -102,17 +107,19 @@ export function Board({ notes, isEditable }: Props) {
         minHeight="calc(100vh - 250px)"
         sx={{ overflowX: "auto" }}
       >
-        {columns.map(({ title, items }) => (
+        {columns.map(({ title, items, state }) => (
           <BoardColumn
-            key={title}
+            key={state}
             title={title}
             items={items}
+            state={state}
             isEditable={isEditable}
             hoveredColumn={hoveredColumn}
             setHoveredColumn={setHoveredColumn}
             onDragStart={handleDragStart}
             onDrop={handleDrop}
             onDragEnd={handleDragEnd}
+            selectedUserId={selectedUserId}
           />
         ))}
       </Stack>

@@ -1,5 +1,6 @@
 import { Session } from "next-auth"
 import { JWT } from "next-auth/jwt"
+import { TNoteState } from "./types"
 
 export interface IExtendedSession extends Session {
   accessToken?: string
@@ -63,7 +64,7 @@ export interface INote {
   name: string
   owner_id: number
   color: string
-  state: string
+  state: TNoteState
   index: number
   updated: string
   created: string
@@ -72,7 +73,7 @@ export interface INote {
 export interface IRawNote {
   id: string
   text: string
-  state: "notes" | "todo" | "in_progress" | "done"
+  state: TNoteState
   index: number
   owner: {
     id: string
@@ -148,4 +149,10 @@ export interface ISnapshotData {
 export interface IColumn {
   title: string
   orderKey: number
+}
+
+export interface IColumnData {
+  title: string
+  state: TNoteState
+  items: INote[]
 }
