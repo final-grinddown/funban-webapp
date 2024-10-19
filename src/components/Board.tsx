@@ -2,14 +2,15 @@ import { DragEvent, useMemo, useRef, useState } from "react"
 import { Box, Divider, Stack } from "@mui/material"
 import { createUpdateNoteReorder } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
-import { IColumn, IColumnData, INote } from "@/utils/interfaces"
+import { IColumnData, INote } from "@/utils/interfaces"
+import { getStoredColumnOrder } from "@/utils/storage"
 import { BackdropLoading } from "./BackdropLoading"
 import { BoardColumn } from "./BoardColumn"
 
 interface Props {
   notes: INote[]
   isEditable: boolean
-  selectedUserId: number
+  selectedUserId?: number
 }
 
 export function Board({ notes, isEditable, selectedUserId }: Props) {
@@ -17,23 +18,7 @@ export function Board({ notes, isEditable, selectedUserId }: Props) {
   const draggingItemIdRef = useRef<string | null>(null)
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
 
-  // Prefix for localStorage key
-  const STORAGE_KEY = "funban-column-order"
-
-  // Default column order
-  const defaultOrder: IColumn[] = [
-    { title: "NOTES", orderKey: 0 },
-    { title: "TODO", orderKey: 1 },
-    { title: "IN PROGRESS", orderKey: 2 },
-    { title: "DONE", orderKey: 3 },
-  ]
-
-  // State for column order
-  const [columnOrder] = useState<IColumn[]>(() => {
-    const savedOrder = localStorage.getItem(STORAGE_KEY)
-
-    return savedOrder ? JSON.parse(savedOrder) : defaultOrder
-  })
+  const columnOrder = getStoredColumnOrder()
 
   const columns = useMemo(() => {
     const columnData: IColumnData[] = [
@@ -41,30 +26,34 @@ export function Board({ notes, isEditable, selectedUserId }: Props) {
         title: "NOTES",
         state: "notes",
         items: notes.filter((note) => note.state === "notes").sort((a, b) => a.index - b.index),
+        orderKey: 0,
       },
       {
         title: "TODO",
         state: "todo",
         items: notes.filter((note) => note.state === "todo").sort((a, b) => a.index - b.index),
+        orderKey: 1,
       },
       {
         title: "IN PROGRESS",
         state: "in_progress",
         items: notes.filter((note) => note.state === "in_progress").sort((a, b) => a.index - b.index),
+        orderKey: 2,
       },
       {
         title: "DONE",
         state: "done",
         items: notes.filter((note) => note.state === "done").sort((a, b) => a.index - b.index),
+        orderKey: 3,
       },
     ]
 
-    return columnData.sort((a, b) => {
-      const orderA = columnOrder.find((col) => col.title === a.title)?.orderKey ?? 0
-      const orderB = columnOrder.find((col) => col.title === b.title)?.orderKey ?? 0
-
-      return orderA - orderB
-    })
+    return columnData
+      .map((col) => {
+        const orderKey = columnOrder?.find((o) => o.title === col.title)?.orderKey ?? col.orderKey
+        return { ...col, orderKey }
+      })
+      .sort((a, b) => a.orderKey - b.orderKey)
   }, [notes, columnOrder])
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>, itemId: string) => {
@@ -107,7 +96,7 @@ export function Board({ notes, isEditable, selectedUserId }: Props) {
         minHeight="calc(100vh - 250px)"
         sx={{ overflowX: "auto" }}
       >
-        {columns.map(({ title, items, state }) => (
+        {columns.map(({ title, items, state, orderKey }) => (
           <BoardColumn
             key={state}
             title={title}
@@ -120,6 +109,7 @@ export function Board({ notes, isEditable, selectedUserId }: Props) {
             onDrop={handleDrop}
             onDragEnd={handleDragEnd}
             selectedUserId={selectedUserId}
+            columnIndex={orderKey}
           />
         ))}
       </Stack>

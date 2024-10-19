@@ -1,4 +1,4 @@
-import { DragEvent, useRef, useState } from "react"
+import { DragEvent, useRef, useState, useEffect } from "react"
 import AddIcon from "@mui/icons-material/Add"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { Box, IconButton, List, Typography, Menu, MenuItem, ListItemText, ListItemIcon } from "@mui/material"
@@ -19,7 +19,8 @@ interface Props {
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
   onDrop: (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => void
   onDragEnd: () => void
-  selectedUserId: number
+  columnIndex: number
+  selectedUserId?: number
 }
 
 export function BoardColumn({
@@ -33,6 +34,7 @@ export function BoardColumn({
   onDragEnd,
   onDrop,
   selectedUserId,
+  columnIndex,
 }: Props) {
   const { users } = useWebSocketContext()
   const theme = useTheme()
@@ -118,6 +120,23 @@ export function BoardColumn({
   const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
     setIsDraggingOver(true)
   }
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.shiftKey && !isNaN(Number(event.key))) {
+        const pressedIndex = Number(event.key) - 1 // Convert "Shift+1" to 0, "Shift+2" to 1, etc.
+
+        if (pressedIndex === columnIndex) {
+          setNewNoteDefaultValues({ state: state, ownerId: String(selectedUserId) })
+          setIsAddNewNoteModalOpen(true)
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyPress)
+
+    return () => window.removeEventListener("keydown", handleKeyPress)
+  }, [columnIndex, selectedUserId, state])
 
   return (
     <Box

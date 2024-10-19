@@ -155,4 +155,5 @@ export interface IColumnData {
   title: string
   state: TNoteState
   items: INote[]
+  orderKey: number
 }

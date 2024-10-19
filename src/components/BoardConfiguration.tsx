@@ -13,28 +13,23 @@ import {
   Typography,
 } from "@mui/material"
 import { IColumn } from "@/utils/interfaces"
+import {
+  getStoredColumnOrder,
+  setStoredColumnOrder,
+  getStoredHeaderOption,
+  setStoredHeaderOption,
+} from "@/utils/storage"
 
-const STORAGE_KEY = "funban-column-order"
-const HEADER_CONFIG_KEY = "funban-header-config"
+const INITIAL_COLUMNS: IColumn[] = [
+  { title: "NOTES", orderKey: 0 },
+  { title: "TODO", orderKey: 1 },
+  { title: "IN PROGRESS", orderKey: 2 },
+  { title: "DONE", orderKey: 3 },
+]
 
 export function BoardConfiguration() {
-  const initialColumns: IColumn[] = [
-    { title: "NOTES", orderKey: 0 },
-    { title: "TODO", orderKey: 1 },
-    { title: "IN PROGRESS", orderKey: 2 },
-    { title: "DONE", orderKey: 3 },
-  ]
-
-  const [columns, setColumns] = useState<IColumn[]>(() => {
-    const savedOrder = localStorage.getItem(STORAGE_KEY)
-    return savedOrder ? JSON.parse(savedOrder) : initialColumns
-  })
-
-  const [headerOption, setHeaderOption] = useState<string>(() => {
-    const savedHeaderConfig = localStorage.getItem(HEADER_CONFIG_KEY)
-    return savedHeaderConfig ? savedHeaderConfig : "updated_only"
-  })
-
+  const columns = getStoredColumnOrder() || INITIAL_COLUMNS
+  const [headerOption, setHeaderOption] = useState<string>(getStoredHeaderOption())
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
@@ -65,13 +60,11 @@ export function BoardConfiguration() {
       orderKey: idx,
     }))
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reorderedColumns))
-    setColumns(reorderedColumns)
+    setStoredColumnOrder(reorderedColumns)
     setDraggedIndex(null)
     setDragOverIndex(null)
   }
 
-  // Function to move a column up
   const moveColumnUp = (index: number) => {
     if (index === 0) return
 
@@ -85,11 +78,9 @@ export function BoardConfiguration() {
       orderKey: idx,
     }))
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reorderedColumns))
-    setColumns(reorderedColumns)
+    setStoredColumnOrder(reorderedColumns)
   }
 
-  // Function to move a column down
   const moveColumnDown = (index: number) => {
     if (index === columns.length - 1) return
 
@@ -103,14 +94,13 @@ export function BoardConfiguration() {
       orderKey: idx,
     }))
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reorderedColumns))
-    setColumns(reorderedColumns)
+    setStoredColumnOrder(reorderedColumns)
   }
 
   const handleHeaderOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setHeaderOption(newValue)
-    localStorage.setItem(HEADER_CONFIG_KEY, newValue)
+    setStoredHeaderOption(newValue)
   }
 
   return (
