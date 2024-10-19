@@ -1,11 +1,11 @@
 import { TThemeMode } from "@/utils/types"
-import { isThemeMode } from "./helpers"
+import { isThemeMode, createPrefixedKey } from "./helpers"
 import { IColumn } from "./interfaces"
 
-const THEME_KEY = "funban-theme"
-const USER_EMAIL_KEY = "funban-user-email"
-const HEADER_CONFIG_KEY = "funban-header-config";
-const ORDER_KEY = "funban-column-order";
+const THEME_KEY = createPrefixedKey("theme")
+const USER_EMAIL_KEY = createPrefixedKey("user-email")
+const HEADER_CONFIG_KEY = createPrefixedKey("header-config")
+const ORDER_KEY = createPrefixedKey("column-order")
 
 export const getStoredTheme = (): TThemeMode | null => {
   const storedTheme = window.localStorage.getItem(THEME_KEY)
@@ -38,19 +38,19 @@ export const removeStoredUserEmail = (): void => {
 }
 
 export const getStoredHeaderOption = (): string => {
-  const savedOption = localStorage.getItem(HEADER_CONFIG_KEY);
-  return savedOption ? savedOption : "updated_only";
-};
+  const savedOption = localStorage.getItem(HEADER_CONFIG_KEY)
+  return savedOption ? savedOption : "updated_only"
+}
 
 export const setStoredHeaderOption = (option: string): void => {
-  localStorage.setItem(HEADER_CONFIG_KEY, option);
-};
+  localStorage.setItem(HEADER_CONFIG_KEY, option)
+}
 
 export const getStoredColumnOrder = (): IColumn[] | null => {
-  const savedOrder = window.localStorage.getItem(ORDER_KEY);
-  return savedOrder ? JSON.parse(savedOrder) : null;
-};
+  const savedOrder = window.localStorage.getItem(ORDER_KEY)
+  return savedOrder ? JSON.parse(savedOrder) : null
+}
 
 export const setStoredColumnOrder = (order: IColumn[]): void => {
-  window.localStorage.setItem(ORDER_KEY, JSON.stringify(order));
-};
+  window.localStorage.setItem(ORDER_KEY, JSON.stringify(order))
+}
