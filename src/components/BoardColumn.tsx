@@ -21,6 +21,8 @@ interface Props {
   onDragEnd: () => void
   columnIndex: number
   selectedUserId?: number
+  isAnyModalOpen: boolean
+  setIsAnyModalOpen: (isOpen: boolean) => void
 }
 
 export function BoardColumn({
@@ -35,6 +37,8 @@ export function BoardColumn({
   onDrop,
   selectedUserId,
   columnIndex,
+  isAnyModalOpen,
+  setIsAnyModalOpen,
 }: Props) {
   const { users } = useWebSocketContext()
   const theme = useTheme()
@@ -58,10 +62,12 @@ export function BoardColumn({
     handleCloseMenu()
     setNewNoteDefaultValues({ state: state, ownerId: String(selectedUserId) })
     setIsAddNewNoteModalOpen(true)
+    setIsAnyModalOpen(true)
   }
   const handleCloseAddNewNoteModal = () => {
     setIsAddNewNoteModalOpen(false)
     setNewNoteDefaultValues({ state: "", ownerId: "" })
+    setIsAnyModalOpen(false)
   }
 
   // Calculate the position based on Y-coordinate
@@ -123,20 +129,29 @@ export function BoardColumn({
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.shiftKey && !isNaN(Number(event.key))) {
-        const pressedIndex = Number(event.key) - 1 // Convert "Shift+1" to 0, "Shift+2" to 1, etc.
+      if (isAnyModalOpen) {
+        // Prevent opening another modal if any modal is already open globally
+        return
+      }
 
+      if (event.shiftKey && !isNaN(Number(event.key))) {
+        const pressedIndex = Number(event.key) - 1
+
+        // Only open the modal for the specific column and if no modal is open globally
         if (pressedIndex === columnIndex) {
           setNewNoteDefaultValues({ state: state, ownerId: String(selectedUserId) })
           setIsAddNewNoteModalOpen(true)
+          setIsAnyModalOpen(true) // Mark the global modal state as open
         }
       }
     }
 
     window.addEventListener("keydown", handleKeyPress)
 
-    return () => window.removeEventListener("keydown", handleKeyPress)
-  }, [columnIndex, selectedUserId, state])
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress)
+    }
+  }, [columnIndex, selectedUserId, state, isAnyModalOpen, setIsAnyModalOpen])
 
   return (
     <Box

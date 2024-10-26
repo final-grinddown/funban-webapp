@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import SettingsIcon from "@mui/icons-material/Settings"
 import { Box, Button, ButtonGroup, Typography } from "@mui/material"
 import { AddNewNoteModal } from "@/components/AddNewNoteModal"
@@ -32,6 +32,8 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
     handleCloseAddNewNoteModal,
     handleOpenMenu,
     handleCloseMenu,
+    isAnyModalOpen,
+    setIsAnyModalOpen,
   } = useBoardModalManagement(isFocus, handleEndFocus)
 
   const snapshot = useMemo(
@@ -92,7 +94,13 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         </ButtonGroup>
       </Box>
 
-      <Board notes={notes} isEditable={true} selectedUserId={parseInt(user)} />
+      <Board
+        notes={notes}
+        isEditable={true}
+        selectedUserId={parseInt(user)}
+        isAnyModalOpen={isAnyModalOpen}
+        setIsAnyModalOpen={setIsAnyModalOpen}
+      />
 
       <AddNewNoteModal isOpen={isAddNewNoteModalOpen} onClose={handleCloseAddNewNoteModal} users={users} />
 

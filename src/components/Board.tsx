@@ -10,10 +10,12 @@ import { BoardColumn } from "./BoardColumn"
 interface Props {
   notes: INote[]
   isEditable: boolean
+  isAnyModalOpen: boolean
+  setIsAnyModalOpen: (isOpen: boolean) => void
   selectedUserId?: number
 }
 
-export function Board({ notes, isEditable, selectedUserId }: Props) {
+export function Board({ notes, isEditable, selectedUserId, isAnyModalOpen, setIsAnyModalOpen }: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const draggingItemIdRef = useRef<string | null>(null)
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
@@ -110,6 +112,8 @@ export function Board({ notes, isEditable, selectedUserId }: Props) {
             onDragEnd={handleDragEnd}
             selectedUserId={selectedUserId}
             columnIndex={orderKey}
+            isAnyModalOpen={isAnyModalOpen}
+            setIsAnyModalOpen={setIsAnyModalOpen}
           />
         ))}
       </Stack>
