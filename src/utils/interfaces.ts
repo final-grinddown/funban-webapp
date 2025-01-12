@@ -65,7 +65,7 @@ export interface INote {
   owner_id: number
   color: string
   state: TNoteState
-  index: number
+  predecessor_id: number | null
   updated: string
   created: string
 }
@@ -74,7 +74,7 @@ export interface IRawNote {
   id: string
   text: string
   state: TNoteState
-  index: number
+  predecessor_id: string | null
   owner: {
     id: string
     name: string
@@ -97,11 +97,15 @@ export interface IUpdateNote {
   updates: NoteUpdate[]
 }
 
-export interface NoteUpdate {
-  target: "Text" | "Order"
-  text?: string
-  new_status?: string
-}
+export type NoteUpdate =
+  | {
+      target: "Text"
+      text: string
+    }
+  | {
+      target: "Order"
+      over_id: MoveTarget
+    }
 
 export interface IUpdateNoteText {
   type: "UpdateNoteText"
@@ -122,8 +126,19 @@ export interface ICloneNote {
 export interface IUpdateReorderNote {
   type: "Reorder"
   moved_item_id: number
-  destination_status: string
-  new_index: number | null
+  over_id: MoveTarget
+}
+
+export type MoveTarget = MoveTargetBefore | MoveTargetLast
+
+export type MoveTargetBefore = {
+  type: "Before"
+  id: number
+}
+
+export type MoveTargetLast = {
+  type: "Last"
+  state: string
 }
 
 export interface IHistoryItem {

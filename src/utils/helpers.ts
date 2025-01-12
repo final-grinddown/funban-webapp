@@ -67,7 +67,7 @@ export function normalizeNotes(notes: IRawNote[]): INote[] {
     owner_id: Number(note.owner.id),
     color: note.owner.color,
     state: note.state,
-    index: note.index,
+    predecessor_id: note.predecessor_id ? Number(note.predecessor_id) : null,
     updated: note.updated,
     created: note.created,
   }))

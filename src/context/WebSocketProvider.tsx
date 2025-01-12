@@ -91,7 +91,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                   ? {
                       ...note,
                       state: op.state,
-                      index: op.index,
+                      predecessor_id: op.predecessor_id,
                       updated: new Date().toISOString(),
                     }
                   : note,

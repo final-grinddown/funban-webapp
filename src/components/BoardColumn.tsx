@@ -17,7 +17,7 @@ interface Props {
   hoveredColumn: string | null
   setHoveredColumn: (columnId: string | null) => void
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
-  onDrop: (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => void
+  onDrop: (event: DragEvent<HTMLDivElement>, columnId: string, index: number | null) => void
   onDragEnd: () => void
   columnIndex: number
   selectedUserId?: number
@@ -42,7 +42,8 @@ export function BoardColumn({
 }: Props) {
   const { users } = useWebSocketContext()
   const theme = useTheme()
-  const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null)
+  //const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null)
+  const [draggedOverId, setDraggedOverId] = useState<number | "last" | null>(null)
   const lastHoveredRef = useRef<string | null>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -81,30 +82,49 @@ export function BoardColumn({
 
     const boundingRect = element.getBoundingClientRect()
     const midpoint = (boundingRect.top + boundingRect.bottom) / 2
-
+    let curr_id = element.dataset.id
     if (event.clientY < midpoint) {
       // If mouse is above the midpoint of the card, show placeholder before the card
-      if (draggedOverIndex !== index) {
-        setDraggedOverIndex(index)
+      if (draggedOverId !== curr_id) {
+        //setDraggedOverIndex(index)
+        setDraggedOverId(element.dataset.id === "last" ? "last" : Number(element.dataset.id))
       }
     } else {
-      // If mouse is below the midpoint, show placeholder after the card
-      if (draggedOverIndex !== index + 1) {
-        setDraggedOverIndex(index + 1)
+      let curr_next = element.nextElementSibling as HTMLElement
+
+      if (curr_next) {
+        let curr_next_id = curr_next.dataset.id
+
+        if (draggedOverId !== curr_next_id) {
+          setDraggedOverId(curr_next_id === "last" ? "last" : Number(curr_next_id))
+        }
+      } else {
+        setDraggedOverId("last")
       }
+
+      // If mouse is below the midpoint, show placeholder after the card
+      // if (draggedOverIndex !== index + 1) {
+      //   //setDraggedOverIndex(index + 1)
+      //   if (element.nextElementSibling) {
+      //     setDraggedOverId())
+      //   } else {
+      //     setDraggedOverId("last")
+      //   }
+      // }
     }
   }
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault()
 
-    if (draggedOverIndex === null) {
-      setDraggedOverIndex(0) // If the column is empty, drop the item at index 0
+    if (draggedOverId === null) {
+      setDraggedOverId("last") // If the column is empty, drop the item at index 0
     }
 
-    onDrop(event, title, draggedOverIndex ?? 0)
+    onDrop(event, title, draggedOverId === "last" ? null : draggedOverId)
 
-    setDraggedOverIndex(null)
+    //setDraggedOverIndex(null)
+    setDraggedOverId(null)
     setIsDraggingOver(false)
     lastHoveredRef.current = null
     setHoveredColumn(null)
@@ -117,7 +137,8 @@ export function BoardColumn({
       return
     }
 
-    setDraggedOverIndex(null)
+    //setDraggedOverIndex(null)
+    setDraggedOverId(null)
     setIsDraggingOver(false)
     lastHoveredRef.current = null
     setHoveredColumn(null)
@@ -208,15 +229,25 @@ export function BoardColumn({
         )}
 
         {items.map((item, index) => (
-          <div key={item.id} onDragOver={(event) => handleDragOver(event, index, event.currentTarget)}>
-            {draggedOverIndex === index && (
+          <div
+            key={item.id}
+            data-id={item.id}
+            onDragOver={(event) => handleDragOver(event, index, event.currentTarget)}
+          >
+            {draggedOverId === item.id && (
               <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
             )}
-            <BoardItemCard {...item} isEditable={isEditable} onDragStart={onDragStart} onDragEnd={onDragEnd} />
+            <BoardItemCard
+              {...item}
+              isEditable={isEditable}
+              predecessor_id={item.predecessor_id}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+            />
           </div>
         ))}
 
-        {draggedOverIndex === items.length && (
+        {draggedOverId === "last" && (
           <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
         )}
       </List>

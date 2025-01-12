@@ -72,7 +72,10 @@ export function createUpdateNote(id: string, text: string, destinationStatus: st
       },
       {
         target: "Order",
-        new_status: destinationStatus,
+        over_id: {
+          type: "Last",
+          state: destinationStatus,
+        },
       },
     ],
   }
@@ -90,12 +93,27 @@ export function createUpdateNoteText(id: string, text: string): string {
   return JSON.stringify(action)
 }
 
-export function createUpdateNoteReorder(id: string, destinationStatus: string, newIndex?: number): string {
+export function createUpdateNoteReorderBefore(id: string, over_id: number): string {
   const action: IUpdateReorderNote = {
     type: "Reorder",
     moved_item_id: parseInt(id),
-    destination_status: destinationStatus,
-    new_index: newIndex ?? null,
+    over_id: {
+      type: "Before",
+      id: over_id,
+    },
+  }
+
+  return JSON.stringify(action)
+}
+
+export function createUpdateNoteReorderLast(id: string, state: string): string {
+  const action: IUpdateReorderNote = {
+    type: "Reorder",
+    moved_item_id: parseInt(id),
+    over_id: {
+      type: "Last",
+      state,
+    },
   }
 
   return JSON.stringify(action)

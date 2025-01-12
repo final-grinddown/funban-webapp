@@ -1,6 +1,6 @@
 import { DragEvent, useMemo, useRef, useState } from "react"
 import { Box, Divider, Stack } from "@mui/material"
-import { createUpdateNoteReorder } from "@/app/api/websocket"
+import { createUpdateNoteReorderBefore, createUpdateNoteReorderLast } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { IColumnData, INote } from "@/utils/interfaces"
 import { getStoredColumnOrder } from "@/utils/storage"
@@ -23,29 +23,54 @@ export function Board({ notes, isEditable, selectedUserId, isAnyModalOpen, setIs
   const columnOrder = getStoredColumnOrder()
 
   const columns = useMemo(() => {
+    const sortNotes = (notes: INote[]) => {
+      const idToNote = new Map<number, INote>()
+      const sorted: INote[] = []
+      const visited = new Set<number>()
+
+      notes.forEach((note) => idToNote.set(note.id, note))
+
+      // Find roots (notes with no predecessor)
+      const roots = notes.filter((note) => note.predecessor_id === null)
+
+      // Traverse linked list
+      roots.forEach((root) => {
+        let current: INote | undefined = root
+        while (current && !visited.has(current.id)) {
+          sorted.push(current)
+          visited.add(current.id)
+          current = idToNote.get(notes.find((note) => note.predecessor_id === current!.id)?.id ?? NaN)
+        }
+      })
+
+      // Add any orphaned notes (not in a valid chain)
+      const orphaned = notes.filter((note) => !visited.has(note.id))
+      return [...sorted, ...orphaned]
+    }
+
     const columnData: IColumnData[] = [
       {
         title: "NOTES",
         state: "notes",
-        items: notes.filter((note) => note.state === "notes").sort((a, b) => a.index - b.index),
+        items: sortNotes(notes.filter((note) => note.state === "notes")),
         orderKey: 0,
       },
       {
         title: "TODO",
         state: "todo",
-        items: notes.filter((note) => note.state === "todo").sort((a, b) => a.index - b.index),
+        items: sortNotes(notes.filter((note) => note.state === "todo")),
         orderKey: 1,
       },
       {
         title: "IN PROGRESS",
         state: "in_progress",
-        items: notes.filter((note) => note.state === "in_progress").sort((a, b) => a.index - b.index),
+        items: sortNotes(notes.filter((note) => note.state === "in_progress")),
         orderKey: 2,
       },
       {
         title: "DONE",
         state: "done",
-        items: notes.filter((note) => note.state === "done").sort((a, b) => a.index - b.index),
+        items: sortNotes(notes.filter((note) => note.state === "done")),
         orderKey: 3,
       },
     ]
@@ -63,7 +88,7 @@ export function Board({ notes, isEditable, selectedUserId, isAnyModalOpen, setIs
     event.stopPropagation()
   }
 
-  const handleDrop = (event: DragEvent<HTMLDivElement>, columnId: string, index: number) => {
+  const handleDrop = (event: DragEvent<HTMLDivElement>, columnId: string, over_id: number | null) => {
     event.preventDefault()
 
     if (!draggingItemIdRef.current) return
@@ -74,10 +99,11 @@ export function Board({ notes, isEditable, selectedUserId, isAnyModalOpen, setIs
 
     const newState = columnId.toLowerCase().replace(" ", "_")
 
-    // Ensure that the index is handled correctly for empty columns
-    const newIndex = index !== null && index !== undefined ? index : 0
+    const message =
+      over_id != null && over_id != undefined
+        ? createUpdateNoteReorderBefore(draggedNote.id.toString(), over_id)
+        : createUpdateNoteReorderLast(draggedNote.id.toString(), newState)
 
-    const message = createUpdateNoteReorder(draggedNote.id.toString(), newState, newIndex)
     sendMessage(message)
 
     draggingItemIdRef.current = null

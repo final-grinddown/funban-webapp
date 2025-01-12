@@ -30,6 +30,7 @@ const HEADER_CONFIG_KEY = "funban-header-config"
 
 interface Props extends INote {
   isEditable: boolean
+  predecessor_id: number | null
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
   onDragEnd: () => void
 }
@@ -43,6 +44,7 @@ export function BoardItemCard({
   created,
   id,
   isEditable,
+  predecessor_id,
   onDragStart,
   onDragEnd,
 }: Props) {
@@ -191,6 +193,7 @@ export function BoardItemCard({
                   aria-controls={openMenu ? "basic-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={openMenu ? "true" : undefined}
+                  size="small"
                 >
                   <EditNoteIcon />
                 </IconButton>
