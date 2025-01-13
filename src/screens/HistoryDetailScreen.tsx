@@ -188,7 +188,7 @@ export function HistoryDetailScreen({ id }: { id?: string }) {
       <Typography variant="h1" component="h1">
         History Detail for: {data?.label}
       </Typography>
-      <Board notes={notes} isEditable={false} />
+      <Board notes={notes} isEditable={false} isAnyModalOpen={false} setIsAnyModalOpen={() => {}} />
     </Box>
   )
 }

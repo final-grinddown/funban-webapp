@@ -42,7 +42,7 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         id: note.id.toString(),
         text: note.text,
         state: note.state,
-        index: note.index,
+        predecessor_id: note.predecessor_id?.toString() ?? null,
         owner: { id: note.owner_id.toString(), name: note.name, color: note.color },
         updated: note.updated,
         created: note.created,
