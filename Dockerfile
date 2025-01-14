@@ -5,6 +5,14 @@ WORKDIR /app
 # Enable corepack for Yarn 4
 RUN corepack enable
 
+# Define build arguments
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WS_URL
+
+# Set environment variables for build
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+
 # Install dependencies
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn/ ./.yarn/
