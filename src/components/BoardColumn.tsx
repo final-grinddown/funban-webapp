@@ -95,7 +95,7 @@ export function BoardColumn({
       if (curr_next) {
         let curr_next_id = curr_next.dataset.id
 
-        if (draggedOverId !== curr_next_id) {
+        if (curr_next_id !== undefined && draggedOverId !== curr_next_id) {
           setDraggedOverId(curr_next_id === "last" ? "last" : Number(curr_next_id))
         }
       } else {
