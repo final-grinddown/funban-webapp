@@ -5,6 +5,7 @@ import { Box, IconButton, List, Typography, Menu, MenuItem, ListItemText, ListIt
 import { useTheme } from "@mui/material/styles"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { INote } from "@/utils/interfaces"
+import { useFocusStateStore } from "@/utils/store"
 import { AddNewNoteModal } from "./AddNewNoteModal"
 import { BoardItemCard } from "./BoardItemCard"
 import { DragAndDropPlaceholder } from "./DragAndDropPlaceholder"
@@ -50,6 +51,7 @@ export function BoardColumn({
   const openMenu = Boolean(anchorEl)
   const [isAddNewNoteModalOpen, setIsAddNewNoteModalOpen] = useState(false)
   const [newNoteDefaultValues, setNewNoteDefaultValues] = useState({ state: "", ownerId: "" })
+  const { isFocus, currentUser } = useFocusStateStore()
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -228,24 +230,26 @@ export function BoardColumn({
           <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} />
         )}
 
-        {items.map((item, index) => (
-          <div
-            key={item.id}
-            data-id={item.id}
-            onDragOver={(event) => handleDragOver(event, index, event.currentTarget)}
-          >
-            {draggedOverId === item.id && (
-              <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
-            )}
-            <BoardItemCard
-              {...item}
-              isEditable={isEditable}
-              predecessor_id={item.predecessor_id}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-            />
-          </div>
-        ))}
+        {items
+          .filter((i) => !isFocus || i.name === currentUser)
+          .map((item, index) => (
+            <div
+              key={item.id}
+              data-id={item.id}
+              onDragOver={(event) => handleDragOver(event, index, event.currentTarget)}
+            >
+              {draggedOverId === item.id && (
+                <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
+              )}
+              <BoardItemCard
+                {...item}
+                isEditable={isEditable}
+                predecessor_id={item.predecessor_id}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
+              />
+            </div>
+          ))}
 
         {draggedOverId === "last" && (
           <DragAndDropPlaceholder onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} />
