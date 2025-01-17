@@ -10,6 +10,7 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  Checkbox,
   Typography,
 } from "@mui/material"
 import { IColumn } from "@/utils/interfaces"
@@ -18,6 +19,10 @@ import {
   setStoredColumnOrder,
   getStoredHeaderOption,
   setStoredHeaderOption,
+  getStoredDevIdsValue,
+  setStoredDevIdsValue,
+  getStoredDevPredecessorsValue,
+  setStoredDevPredecessorsValue,
 } from "@/utils/storage"
 
 const INITIAL_COLUMNS: IColumn[] = [
@@ -30,6 +35,8 @@ const INITIAL_COLUMNS: IColumn[] = [
 export function BoardConfiguration() {
   const columns = getStoredColumnOrder() || INITIAL_COLUMNS
   const [headerOption, setHeaderOption] = useState<string>(getStoredHeaderOption())
+  const [devIdsCheck, setDevIdsCheck] = useState<boolean>(getStoredDevIdsValue())
+  const [devPredecessorsCheck, setDevPredecessorsCheck] = useState<boolean>(getStoredDevPredecessorsValue())
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
@@ -103,6 +110,18 @@ export function BoardConfiguration() {
     setStoredHeaderOption(newValue)
   }
 
+  const handleDevIdsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked
+    setDevIdsCheck(newValue)
+    setStoredDevIdsValue(newValue)
+  }
+
+  const handleDevPredecessorsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked
+    setDevPredecessorsCheck(newValue)
+    setStoredDevPredecessorsValue(newValue)
+  }
+
   return (
     <>
       <Typography variant="h2">Column Order Configuration</Typography>
@@ -173,6 +192,20 @@ export function BoardConfiguration() {
           <FormControlLabel value="updated_only" control={<Radio />} label="Show Updated only" />
           <FormControlLabel value="created_updated" control={<Radio />} label="Show Created and Updated" />
         </RadioGroup>
+      </FormControl>
+
+      <Typography variant="h2" mt={6} mb={2}>
+        Developer options
+      </Typography>
+      <FormControl component="fieldset">
+        <FormControlLabel
+          control={<Checkbox checked={devIdsCheck} onChange={handleDevIdsChange} />}
+          label="Show note ID"
+        />
+        <FormControlLabel
+          control={<Checkbox checked={devPredecessorsCheck} onChange={handleDevPredecessorsChange} />}
+          label="Show note predecessor ID"
+        />
       </FormControl>
     </>
   )

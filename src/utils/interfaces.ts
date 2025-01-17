@@ -141,6 +141,11 @@ export type MoveTargetLast = {
   state: string
 }
 
+export type DevSettings = {
+  ids: boolean
+  predecessors: boolean
+}
+
 export interface IHistoryItem {
   id: number
   created_at: string
