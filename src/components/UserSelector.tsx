@@ -6,10 +6,9 @@ interface UserSelectorProps {
   users: IUser[]
   selectedUser: string
   onChange: (event: SelectChangeEvent) => void
-  isDisabled: boolean
 }
 
-export function UserSelector({ users, selectedUser, onChange, isDisabled }: UserSelectorProps) {
+export function UserSelector({ users, selectedUser, onChange }: UserSelectorProps) {
   return (
     <FormControl sx={{ maxWidth: { sm: 220 } }} size="small" fullWidth>
       <InputLabel id="select-current-user">Choose current user</InputLabel>
@@ -19,7 +18,6 @@ export function UserSelector({ users, selectedUser, onChange, isDisabled }: User
         label="Choose current user"
         onChange={onChange}
         startAdornment={<AccountCircleIcon sx={{ marginRight: 1 }} />}
-        disabled={isDisabled}
       >
         {users.map((user) => (
           <MenuItem key={user.id} value={user.id}>
