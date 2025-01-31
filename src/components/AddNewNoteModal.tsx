@@ -26,6 +26,10 @@ interface Props {
   users: IUser[]
   isOpen: boolean
   onClose: () => void
+  defaultValues?: {
+    state: string
+    ownerId: string
+  }
 }
 
 interface FormInputs {
@@ -35,7 +39,7 @@ interface FormInputs {
   saveAndCreateNext: boolean
 }
 
-export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
+export function AddNewNoteModal({ users, isOpen, onClose, defaultValues }: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const textAreaRef = useRef<HTMLInputElement>(null)
@@ -48,7 +52,12 @@ export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
     watch,
     formState: { errors, isDirty, isValid },
   } = useForm<FormInputs>({
-    defaultValues: { text: "", state: "", owner: "", saveAndCreateNext: false },
+    defaultValues: {
+      text: "",
+      state: "",
+      owner: "",
+      saveAndCreateNext: false,
+    },
     mode: "onChange",
   })
 
@@ -69,6 +78,16 @@ export function AddNewNoteModal({ users, isOpen, onClose }: Props) {
       }, 0)
     }
   }
+
+  // Reset form with defaultValues when modal is opened
+  useEffect(() => {
+    if (isOpen && defaultValues?.state && defaultValues?.ownerId) {
+      reset({
+        state: defaultValues?.state,
+        owner: defaultValues?.ownerId,
+      })
+    }
+  }, [isOpen, reset, defaultValues])
 
   useEffect(() => {
     if (isOpen && !isLoading) {

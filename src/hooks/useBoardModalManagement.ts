@@ -3,25 +3,34 @@ import { SyntheticEvent, useState } from "react"
 export function useBoardModalManagement(isFocus: boolean, handleEndFocus: () => void) {
   const [isAddNewNoteModalOpen, setIsAddNewNoteModalOpen] = useState(false)
   const [isEndStatusModalOpen, setIsEndStatusModalOpen] = useState(false)
+  const [isAnyModalOpen, setIsAnyModalOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const handleOpenAddNewNoteModal = () => {
     setIsAddNewNoteModalOpen(true)
+    setIsAnyModalOpen(true)
 
     if (isFocus) {
       handleEndFocus()
     }
   }
-  const handleCloseAddNewNoteModal = () => setIsAddNewNoteModalOpen(false)
+  const handleCloseAddNewNoteModal = () => {
+    setIsAddNewNoteModalOpen(false)
+    setIsAnyModalOpen(false)
+  }
 
   const handleOpenEndStatusModal = () => {
     setIsEndStatusModalOpen(true)
+    setIsAnyModalOpen(true)
 
     if (isFocus) {
       handleEndFocus()
     }
   }
-  const handleCloseEndStatusModal = () => setIsEndStatusModalOpen(false)
+  const handleCloseEndStatusModal = () => {
+    setIsEndStatusModalOpen(false)
+    setIsAnyModalOpen(false)
+  }
 
   const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -43,5 +52,7 @@ export function useBoardModalManagement(isFocus: boolean, handleEndFocus: () => 
     handleCloseEndStatusModal,
     handleOpenMenu,
     handleCloseMenu,
+    isAnyModalOpen,
+    setIsAnyModalOpen,
   }
 }

@@ -15,7 +15,7 @@ import {
   TextField,
 } from "@mui/material"
 import { Controller, useForm } from "react-hook-form"
-import { createUpdateNote, createUpdateNoteReorder, createUpdateNoteText } from "@/app/api/websocket"
+import { createUpdateNote, createUpdateNoteReorderLast, createUpdateNoteText } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { handleKeyDownSubmit } from "@/utils/helpers"
 import { INote } from "@/utils/interfaces"
@@ -62,7 +62,7 @@ export function EditNoteModal({ isOpen, noteId, noteState, noteText, onClose, ha
       const message = createUpdateNoteText(noteId.toString(), data.text)
       sendMessage(message)
     } else if (hasStateChanged) {
-      const message = createUpdateNoteReorder(noteId.toString(), data.state)
+      const message = createUpdateNoteReorderLast(noteId.toString(), data.state)
       sendMessage(message)
     }
   }

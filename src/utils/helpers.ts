@@ -3,6 +3,18 @@ import { format, formatDistanceToNow } from "date-fns"
 import { TThemeMode } from "@/utils/types"
 import { INote, IRawNote } from "./interfaces"
 
+const PROJECT_PREFIX = "funban-"
+
+/**
+ * Creates a prefixed key by appending the given key to the project prefix.
+ *
+ * @param key - The key to be prefixed.
+ * @returns The key with the project-specific prefix.
+ */
+export function createPrefixedKey(key: string): string {
+  return `${PROJECT_PREFIX}${key}`
+}
+
 /**
  * Checks if a given value is a valid TThemeMode ("light" or "dark").
  *
@@ -55,7 +67,7 @@ export function normalizeNotes(notes: IRawNote[]): INote[] {
     owner_id: Number(note.owner.id),
     color: note.owner.color,
     state: note.state,
-    index: note.index,
+    predecessor_id: note.predecessor_id ? Number(note.predecessor_id) : null,
     updated: note.updated,
     created: note.created,
   }))

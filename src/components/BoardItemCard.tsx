@@ -21,7 +21,8 @@ import { createCloneNote } from "@/app/api/websocket"
 import { useWebSocketContext } from "@/context/WebSocketProvider"
 import { availableColors } from "@/utils/constants"
 import { formatDateToShow, matchColorName } from "@/utils/helpers"
-import { INote } from "@/utils/interfaces"
+import { DevSettings, INote } from "@/utils/interfaces"
+import { getStoredDevIdsValue, getStoredDevPredecessorsValue } from "@/utils/storage"
 import { useFocusStateStore } from "@/utils/store"
 import { DeleteNoteModal } from "./DeleteNoteModal"
 import { EditNoteModal } from "./EditNoteModal"
@@ -30,6 +31,7 @@ const HEADER_CONFIG_KEY = "funban-header-config"
 
 interface Props extends INote {
   isEditable: boolean
+  predecessor_id: number | null
   onDragStart: (event: DragEvent<HTMLDivElement>, itemId: string) => void
   onDragEnd: () => void
 }
@@ -43,6 +45,7 @@ export function BoardItemCard({
   created,
   id,
   isEditable,
+  predecessor_id,
   onDragStart,
   onDragEnd,
 }: Props) {
@@ -64,7 +67,7 @@ export function BoardItemCard({
       ? `Updated at ${isEditable ? updatedRelative : updatedDate}`
       : `Created at ${isEditable ? createdRelative : createdDate}`
   const headerConfig = localStorage.getItem(HEADER_CONFIG_KEY) || "updated_only"
-
+  const devSettings: DevSettings = { ids: getStoredDevIdsValue(), predecessors: getStoredDevPredecessorsValue() }
   const handleMenu = useCallback(
     (event: SyntheticEvent<HTMLButtonElement> | null) => {
       setAnchorEl(event ? event.currentTarget : null)
@@ -153,7 +156,8 @@ export function BoardItemCard({
                 color: alpha(contrastColor, 0.85),
               }}
             >
-              {name}
+              {name} {devSettings.ids ? ` (${id})` : ""}
+              {devSettings.predecessors ? ` (^${predecessor_id})` : ""}
             </Typography>
           }
           subheader={
@@ -191,6 +195,7 @@ export function BoardItemCard({
                   aria-controls={openMenu ? "basic-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={openMenu ? "true" : undefined}
+                  size="small"
                 >
                   <EditNoteIcon />
                 </IconButton>

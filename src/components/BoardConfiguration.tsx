@@ -10,31 +10,33 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  Checkbox,
   Typography,
 } from "@mui/material"
 import { IColumn } from "@/utils/interfaces"
+import {
+  getStoredColumnOrder,
+  setStoredColumnOrder,
+  getStoredHeaderOption,
+  setStoredHeaderOption,
+  getStoredDevIdsValue,
+  setStoredDevIdsValue,
+  getStoredDevPredecessorsValue,
+  setStoredDevPredecessorsValue,
+} from "@/utils/storage"
 
-const STORAGE_KEY = "funban-column-order"
-const HEADER_CONFIG_KEY = "funban-header-config"
+const INITIAL_COLUMNS: IColumn[] = [
+  { title: "NOTES", orderKey: 0 },
+  { title: "TODO", orderKey: 1 },
+  { title: "IN PROGRESS", orderKey: 2 },
+  { title: "DONE", orderKey: 3 },
+]
 
 export function BoardConfiguration() {
-  const initialColumns: IColumn[] = [
-    { title: "NOTES", orderKey: 0 },
-    { title: "TODO", orderKey: 1 },
-    { title: "IN PROGRESS", orderKey: 2 },
-    { title: "DONE", orderKey: 3 },
-  ]
-
-  const [columns, setColumns] = useState<IColumn[]>(() => {
-    const savedOrder = localStorage.getItem(STORAGE_KEY)
-    return savedOrder ? JSON.parse(savedOrder) : initialColumns
-  })
-
-  const [headerOption, setHeaderOption] = useState<string>(() => {
-    const savedHeaderConfig = localStorage.getItem(HEADER_CONFIG_KEY)
-    return savedHeaderConfig ? savedHeaderConfig : "updated_only"
-  })
-
+  const columns = getStoredColumnOrder() || INITIAL_COLUMNS
+  const [headerOption, setHeaderOption] = useState<string>(getStoredHeaderOption())
+  const [devIdsCheck, setDevIdsCheck] = useState<boolean>(getStoredDevIdsValue())
+  const [devPredecessorsCheck, setDevPredecessorsCheck] = useState<boolean>(getStoredDevPredecessorsValue())
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
@@ -65,13 +67,11 @@ export function BoardConfiguration() {
       orderKey: idx,
     }))
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reorderedColumns))
-    setColumns(reorderedColumns)
+    setStoredColumnOrder(reorderedColumns)
     setDraggedIndex(null)
     setDragOverIndex(null)
   }
 
-  // Function to move a column up
   const moveColumnUp = (index: number) => {
     if (index === 0) return
 
@@ -85,11 +85,9 @@ export function BoardConfiguration() {
       orderKey: idx,
     }))
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reorderedColumns))
-    setColumns(reorderedColumns)
+    setStoredColumnOrder(reorderedColumns)
   }
 
-  // Function to move a column down
   const moveColumnDown = (index: number) => {
     if (index === columns.length - 1) return
 
@@ -103,14 +101,25 @@ export function BoardConfiguration() {
       orderKey: idx,
     }))
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reorderedColumns))
-    setColumns(reorderedColumns)
+    setStoredColumnOrder(reorderedColumns)
   }
 
   const handleHeaderOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setHeaderOption(newValue)
-    localStorage.setItem(HEADER_CONFIG_KEY, newValue)
+    setStoredHeaderOption(newValue)
+  }
+
+  const handleDevIdsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked
+    setDevIdsCheck(newValue)
+    setStoredDevIdsValue(newValue)
+  }
+
+  const handleDevPredecessorsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked
+    setDevPredecessorsCheck(newValue)
+    setStoredDevPredecessorsValue(newValue)
   }
 
   return (
@@ -183,6 +192,20 @@ export function BoardConfiguration() {
           <FormControlLabel value="updated_only" control={<Radio />} label="Show Updated only" />
           <FormControlLabel value="created_updated" control={<Radio />} label="Show Created and Updated" />
         </RadioGroup>
+      </FormControl>
+
+      <Typography variant="h2" mt={6} mb={2}>
+        Developer options
+      </Typography>
+      <FormControl component="fieldset">
+        <FormControlLabel
+          control={<Checkbox checked={devIdsCheck} onChange={handleDevIdsChange} />}
+          label="Show note ID"
+        />
+        <FormControlLabel
+          control={<Checkbox checked={devPredecessorsCheck} onChange={handleDevPredecessorsChange} />}
+          label="Show note predecessor ID"
+        />
       </FormControl>
     </>
   )

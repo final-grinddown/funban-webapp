@@ -1,5 +1,6 @@
 import { Session } from "next-auth"
 import { JWT } from "next-auth/jwt"
+import { TNoteState } from "./types"
 
 export interface IExtendedSession extends Session {
   accessToken?: string
@@ -63,8 +64,8 @@ export interface INote {
   name: string
   owner_id: number
   color: string
-  state: string
-  index: number
+  state: TNoteState
+  predecessor_id: number | null
   updated: string
   created: string
 }
@@ -72,8 +73,8 @@ export interface INote {
 export interface IRawNote {
   id: string
   text: string
-  state: "notes" | "todo" | "in_progress" | "done"
-  index: number
+  state: TNoteState
+  predecessor_id: string | null
   owner: {
     id: string
     name: string
@@ -96,11 +97,15 @@ export interface IUpdateNote {
   updates: NoteUpdate[]
 }
 
-export interface NoteUpdate {
-  target: "Text" | "Order"
-  text?: string
-  new_status?: string
-}
+export type NoteUpdate =
+  | {
+      target: "Text"
+      text: string
+    }
+  | {
+      target: "Order"
+      over_id: MoveTarget
+    }
 
 export interface IUpdateNoteText {
   type: "UpdateNoteText"
@@ -121,8 +126,24 @@ export interface ICloneNote {
 export interface IUpdateReorderNote {
   type: "Reorder"
   moved_item_id: number
-  destination_status: string
-  new_index: number | null
+  over_id: MoveTarget
+}
+
+export type MoveTarget = MoveTargetBefore | MoveTargetLast
+
+export type MoveTargetBefore = {
+  type: "Before"
+  id: number
+}
+
+export type MoveTargetLast = {
+  type: "Last"
+  state: string
+}
+
+export type DevSettings = {
+  ids: boolean
+  predecessors: boolean
 }
 
 export interface IHistoryItem {
@@ -147,5 +168,12 @@ export interface ISnapshotData {
 
 export interface IColumn {
   title: string
+  orderKey: number
+}
+
+export interface IColumnData {
+  title: string
+  state: TNoteState
+  items: INote[]
   orderKey: number
 }

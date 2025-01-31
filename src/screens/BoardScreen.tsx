@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import SettingsIcon from "@mui/icons-material/Settings"
 import { Box, Button, ButtonGroup, Typography } from "@mui/material"
 import { AddNewNoteModal } from "@/components/AddNewNoteModal"
@@ -32,6 +32,8 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
     handleCloseAddNewNoteModal,
     handleOpenMenu,
     handleCloseMenu,
+    isAnyModalOpen,
+    setIsAnyModalOpen,
   } = useBoardModalManagement(isFocus, handleEndFocus)
 
   const snapshot = useMemo(
@@ -39,8 +41,8 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
       notes.map((note) => ({
         id: note.id.toString(),
         text: note.text,
-        state: note.state as "notes" | "todo" | "in_progress" | "done",
-        index: note.index,
+        state: note.state,
+        predecessor_id: note.predecessor_id?.toString() ?? null,
         owner: { id: note.owner_id.toString(), name: note.name, color: note.color },
         updated: note.updated,
         created: note.created,
@@ -59,7 +61,7 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         gap={2}
         justifyContent="space-between"
       >
-        <UserSelector users={users} selectedUser={user} onChange={handleChange} isDisabled={isFocus} />
+        <UserSelector users={users} selectedUser={user} onChange={handleChange} />
         <Button
           variant="contained"
           sx={{ display: { md: "none" } }}
@@ -92,7 +94,13 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         </ButtonGroup>
       </Box>
 
-      <Board notes={notes} isEditable />
+      <Board
+        notes={notes}
+        isEditable={true}
+        selectedUserId={parseInt(user)}
+        isAnyModalOpen={isAnyModalOpen}
+        setIsAnyModalOpen={setIsAnyModalOpen}
+      />
 
       <AddNewNoteModal isOpen={isAddNewNoteModalOpen} onClose={handleCloseAddNewNoteModal} users={users} />
 
