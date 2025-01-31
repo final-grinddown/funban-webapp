@@ -149,7 +149,7 @@ export function DashboardLayout({ children, userEmail }: Props) {
           }}
         >
           <Typography variant="body2" color="textSecondary">
-            © 2024 FinalGrindDown <small>{pkg.version}</small>
+            © 2025 FinalGrindDown <small>{pkg.version}</small>
           </Typography>
         </Box>
       </Drawer>
