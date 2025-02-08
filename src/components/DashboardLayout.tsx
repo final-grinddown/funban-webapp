@@ -1,4 +1,5 @@
 "use client"
+
 import { KeyboardEvent, MouseEvent, ReactNode, useState } from "react"
 import { AccountCircle, Logout, Settings } from "@mui/icons-material"
 import DashboardIcon from "@mui/icons-material/Dashboard"
@@ -19,10 +20,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material"
+import getConfig from "next/config"
 import Link from "next/link"
 import { clearApp } from "@/app/api/auth/clearApp"
 import { ERoutes } from "@/utils/enums"
-
+import pkg from "../../package.json"
 interface Props {
   children: ReactNode
   userEmail: string
@@ -147,7 +149,7 @@ export function DashboardLayout({ children, userEmail }: Props) {
           }}
         >
           <Typography variant="body2" color="textSecondary">
-            © 2024 FinalGrindDown
+            © 2025 FinalGrindDown <small>{pkg.version}</small>
           </Typography>
         </Box>
       </Drawer>

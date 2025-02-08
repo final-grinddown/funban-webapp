@@ -7,8 +7,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  NEXT_PUBLIC_API_URL: https://api.funban.joseforge.cz/api
-  NEXT_PUBLIC_WS_URL: wss://api.funban.joseforge.cz/ws
+  NEXT_PUBLIC_API_URL: https://api.funban.dev/api
+  NEXT_PUBLIC_WS_URL: wss://api.funban.dev/ws
 
 jobs:
   build-and-push:
