@@ -11,6 +11,7 @@ import { useBoardModalManagement } from "@/hooks/useBoardModalManagement"
 import { useFocusManagement } from "@/hooks/useFocusManagement"
 import { useUserSelection } from "@/hooks/useUserSelection"
 import { INote, IUser } from "@/utils/interfaces"
+import { useFocusStateStore } from "@/utils/store"
 
 interface Props {
   users: IUser[]
@@ -20,6 +21,7 @@ interface Props {
 
 export function BoardScreen({ users, notes, accessToken }: Props) {
   const { user, handleChange, handlePrevUser, handleNextUser } = useUserSelection(users)
+  const { currentUser } = useFocusStateStore()
   const { isFocus, shouldRenderFocus, handleStartFocus, handleEndFocus } = useFocusManagement(users)
   const {
     isEndStatusModalOpen,
@@ -100,6 +102,8 @@ export function BoardScreen({ users, notes, accessToken }: Props) {
         selectedUserId={parseInt(user)}
         isAnyModalOpen={isAnyModalOpen}
         setIsAnyModalOpen={setIsAnyModalOpen}
+        isFocus={isFocus}
+        currentUser={currentUser}
       />
 
       <AddNewNoteModal isOpen={isAddNewNoteModalOpen} onClose={handleCloseAddNewNoteModal} users={users} />

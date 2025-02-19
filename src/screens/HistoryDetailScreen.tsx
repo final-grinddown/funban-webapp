@@ -1,5 +1,6 @@
 "use client"
 import { SyntheticEvent, useMemo, useState } from "react"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
@@ -15,6 +16,10 @@ import {
   Menu,
   MenuItem,
   Typography,
+  FormControl,
+  Select,
+  InputLabel,
+  SelectChangeEvent,
 } from "@mui/material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
@@ -31,6 +36,7 @@ export function HistoryDetailScreen({ id }: { id?: string }) {
   const queryClient = useQueryClient()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const openMenu = Boolean(anchorEl)
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
 
   const { data, isLoading, error } = useQuery<IHistoryItem>({
     queryKey: ["historyItem", id ?? "last"],
@@ -45,6 +51,15 @@ export function HistoryDetailScreen({ id }: { id?: string }) {
 
     return normalizeNotes(parsedSnapshot)
   }, [data?.snapshot])
+
+  const users = useMemo(() => {
+    // Add the name and id of each owner of note to the set, remove duplicates, order by id
+    const users = new Set<string>()
+    users.add("All")
+    notes.map((note) => note.name).forEach((user) => users.add(user))
+
+    return Array.from(users)
+  }, [notes])
 
   const handleOpenMenu = (event: SyntheticEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -76,6 +91,10 @@ export function HistoryDetailScreen({ id }: { id?: string }) {
         queryFn: () => fetchHistoryItemLast(session?.accessToken),
       })
     }
+  }
+
+  const handleUserChange: (event: SelectChangeEvent) => void = (event) => {
+    setSelectedUser(event.target.value === "All" ? null : event.target.value)
   }
 
   if (isLoading) {
@@ -188,7 +207,30 @@ export function HistoryDetailScreen({ id }: { id?: string }) {
       <Typography variant="h1" component="h1">
         History Detail for: {data?.label}
       </Typography>
-      <Board notes={notes} isEditable={false} isAnyModalOpen={false} setIsAnyModalOpen={() => {}} />
+      <FormControl sx={{ maxWidth: { sm: 220 }, marginTop: 2 }} size="small" fullWidth>
+        <InputLabel id="select-current-user">Choose visible user</InputLabel>
+        <Select
+          labelId="select-current-user"
+          value={selectedUser ?? "All"}
+          label="Choose current user"
+          onChange={handleUserChange}
+          startAdornment={<AccountCircleIcon sx={{ marginRight: 1 }} />}
+        >
+          {users.map((user) => (
+            <MenuItem key={user} value={user}>
+              {user}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Board
+        notes={notes}
+        isEditable={false}
+        isAnyModalOpen={false}
+        setIsAnyModalOpen={() => {}}
+        isFocus={selectedUser != null}
+        currentUser={selectedUser ?? ""}
+      />
     </Box>
   )
 }

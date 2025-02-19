@@ -13,13 +13,22 @@ interface Props {
   isAnyModalOpen: boolean
   setIsAnyModalOpen: (isOpen: boolean) => void
   selectedUserId?: number
+  isFocus: boolean
+  currentUser: string
 }
 
-export function Board({ notes, isEditable, selectedUserId, isAnyModalOpen, setIsAnyModalOpen }: Props) {
+export function Board({
+  notes,
+  isEditable,
+  selectedUserId,
+  isAnyModalOpen,
+  setIsAnyModalOpen,
+  isFocus,
+  currentUser,
+}: Props) {
   const { sendMessage, isLoading } = useWebSocketContext()
   const draggingItemIdRef = useRef<string | null>(null)
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
-
   const columnOrder = getStoredColumnOrder()
 
   const columns = useMemo(() => {
@@ -140,6 +149,8 @@ export function Board({ notes, isEditable, selectedUserId, isAnyModalOpen, setIs
             columnIndex={orderKey}
             isAnyModalOpen={isAnyModalOpen}
             setIsAnyModalOpen={setIsAnyModalOpen}
+            isFocus={isFocus}
+            currentUser={currentUser}
           />
         ))}
       </Stack>
