@@ -1,7 +1,7 @@
 import type { BaseSyntheticEvent, KeyboardEvent } from "react"
 import { format, formatDistanceToNow } from "date-fns"
 import { TThemeMode } from "@/utils/types"
-import { INote, IRawNote } from "./interfaces"
+import { ErrorWithCode, INote, IRawNote } from "./interfaces"
 
 const PROJECT_PREFIX = "funban-"
 
@@ -150,4 +150,11 @@ export const formatDateToShow = (created: string, updated: string) => {
 	const createdRelative = formatDistanceToNow(new Date(created), { addSuffix: true })
 
 	return { updatedDate, createdDate, updatedRelative, createdRelative }
+}
+
+export function hasCode(obj: unknown): obj is ErrorWithCode {
+	return (obj as ErrorWithCode)?.code !== undefined
+		&& (obj as ErrorWithCode)?.message !== undefined
+		&& typeof (obj as ErrorWithCode).code === "string"
+		&& typeof (obj as ErrorWithCode).message === "string";
 }
