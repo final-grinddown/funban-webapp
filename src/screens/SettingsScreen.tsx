@@ -3,6 +3,7 @@
 import { ReactNode, SyntheticEvent, useEffect, useState } from "react"
 import { Box, CircularProgress, Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { useRouter } from "next/navigation"
+import { AccountSettings } from "@/components/AccountSettings"
 import { BoardConfiguration } from "@/components/BoardConfiguration"
 import { TeamManagement } from "@/components/TeamManagement"
 import { IUser } from "@/utils/interfaces"
@@ -77,8 +78,7 @@ export function SettingsScreen({ users }: Props) {
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          <Typography variant="h6">Account Settings</Typography>
-          {/* Add your account-specific UI, like name, avatar, theme mode toggle */}
+          <AccountSettings />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <TeamManagement users={users} />
