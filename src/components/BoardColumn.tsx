@@ -24,6 +24,8 @@ interface Props {
   selectedUserId?: number
   isAnyModalOpen: boolean
   setIsAnyModalOpen: (isOpen: boolean) => void
+  isFocus: boolean
+  currentUser: string
 }
 
 export function BoardColumn({
@@ -40,6 +42,8 @@ export function BoardColumn({
   columnIndex,
   isAnyModalOpen,
   setIsAnyModalOpen,
+  isFocus,
+  currentUser,
 }: Props) {
   const { users } = useWebSocketContext()
   const theme = useTheme()
@@ -51,7 +55,6 @@ export function BoardColumn({
   const openMenu = Boolean(anchorEl)
   const [isAddNewNoteModalOpen, setIsAddNewNoteModalOpen] = useState(false)
   const [newNoteDefaultValues, setNewNoteDefaultValues] = useState({ state: "", ownerId: "" })
-  const { isFocus, currentUser } = useFocusStateStore()
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
